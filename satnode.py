@@ -16,7 +16,6 @@ class SatNode:
         self.vkm = vkm
         self.nov = vkm.nov
         self.sats = None
-        self.topbits = topbits(self.nov, 3)
         self.next = None
         self.done = False
         self.prepare()
@@ -28,27 +27,13 @@ class SatNode:
         return PathManager.sats
 
     def prepare(self):
-        choice = self.vkm.bestchoice()
-        bvks = choice["bestkey"]
-        print(f'bvk: {bvks}')
-        for kn in bvks:
-            xbvk = self.vkm.vkdic[kn]
-            print(f'{xbvk.dic}')
-        self.bvk = self.vkm.vkdic[choice['bestkey'][0]]
-        if self.topbits != choice['bits']:  # the same as self.bvk.bits:
-            self.tx = TxEngine(self.bvk)
-            self.sh.transfer(self.tx)
-            self.tx_vkm = self.vkm.txed_clone(self.tx)
-        else:
-            self.tx_vkm = self.vkm.clone()
-        self.tail_varray = self.sh.spawn_tail(3)
-        self.next_sh = SatHolder(self.tail_varray[:])
-        self.sh.cut_tail(3)
+        self.choice = self.vkm.bestchoice()
+        self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         # after tx_vkm.morph, tx_vkm only has (.vkdic) vk3 left, if any
         # and tx_vkm.nov decreased by 3, used in spawning self.next
-        self.chdic = self.tx_vkm.morph(self)
+        self.tx_vkm, self.chdic = self.vkm.morph(self)
         ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
         print(f'keys: {ks}')
         self.make_paths()

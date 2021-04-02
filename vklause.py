@@ -49,6 +49,15 @@ class VKlause:
             return VKlause(self.kname, d, nov)
         return None
 
+    def compressed_value(self):
+        ''' compress to 3 bits: [2,1,0] keep the order. get bin-value.
+        example: {6:1,4:1,0:0} -> 6(110), {9:0,5:1,1:1} -> 3(011)'''
+        v = 0
+        bs = list(reversed(self.bits[:]))  # ascending: as in [0,4,6]
+        for pos, bit in enumerate(bs):
+            v = set_bit(v, pos, self.dic[bit])
+        return v
+
     def set_value_and_mask(self):
         ''' For the example klause { 7:1,  5:0,     2:1      }
                               BITS:   7  6  5  4  3  2  1  0

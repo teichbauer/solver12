@@ -1,7 +1,6 @@
 from basics import topbits_coverages, print_json
 from vklause import VKlause
 from tnode import TNode
-# from endnodemgr import EndNodeManager
 
 
 class VKManager:
@@ -30,51 +29,29 @@ class VKManager:
 
     # def morph(self, snode, vk12dic):
     def morph(self, snode):
-        ''' only called on a txed (best-vks condensed to top 3 bits) clone.
-            ----------------------------------------------------------------
-            After cut-off top 3 bits, there will be 3 groups of vks:
-            1. the vks with no bits left-over. They are within the top bits
-               the values within 3 bits, covered by these vks (excl_cvs), will
-               be taken away from 2**3 values.
-               rest of 2**3 values are the vals set into chdic/vk12dic
-               These vks will be taken off vkdic
-            2. the vks with no bit in the top bit - they remain 3-bit vks
-               they will have nov -= 3. They remain in vkdic
-            3. vks with bit in, and out of top bits. After cut, they will be
-               vk12. They are put into tdic, keyed by the top-bit value they
-               cover
-            '''
+        '''             '''
         chs = {}  # {<cvr-val>: {kn, ..},..}
         excl_cvs = set([])
         kns = list(self.vkdic.keys())
-        self.nov -= 3  # top 3 bits will be cut off
+        vk3dic = {}
 
-        # tdic: dict for every touched vk: all are vk12, vk3 are in self.vkdic
-        # key: tuple of covered-values, value: list of vks that
-        # have the same covered-values
-        # tdic for fill-in snode.vk12dic, and subset(vks) of it for tnode
         tdic = {}
         for kn in kns:
             vk = self.vkdic[kn]
-            cvr, odic = topbits_coverages(vk, snode.topbits)
-            ln = len(odic)
-            if ln < vk.nob:  #
-                self.vkdic.pop(kn)
-                if ln == 0:  # vk is within topbits, no bit left
-                    for v in cvr:  # collect vk's cover-value
-                        excl_cvs.add(v)
-                else:  # vk has 1 / 2 bits cut away by topbits
-                    if kn in snode.vk12dic:
-                        vk12 = snode.vk12dic[kn]
-                    else:
-                        vk12 = VKlause(kn, odic, self.nov)
-                        snode.vk12dic[kn] = vk12
-                    tdic.setdefault(tuple(cvr), []).append(vk12)
-            else:  # vk.nob == ln: this vk3 remains in self.vkdic
-                vk.nov = self.nov
-
+            if vk.kname in snode.vk12dic:
+                vk12 = snode.vk12dic
+            else:
+                vk12, vk3, cvr = snode.sh.reduce_vk(vk)
+                if vk3:
+                    vk3dic[kn] = vk3
+                elif vk12:
+                    vk12.cvr = cvr
+                    snode.vk12dic[vk12.kname] = vk12
+                else:
+                    excl_cvs.add(cvr)
+            if vk12:
+                tdic.setdefault(tuple(vk12.cvr), []).append(vk12)
         # 2**3 == 8 - number of possible children of the satnoe,
-        # put into satnode.chdic
         for val in range(8):
             if val in excl_cvs:
                 continue
@@ -83,10 +60,6 @@ class VKManager:
                 if val in cvr:  # touched kn/kv does have outside bit
                     vks = tdic[cvr]
                     for vk in vks:
-                        # when added to tnode.vkm, a vk may drop bit for a
-                        # specific val. But that bit-drop maybe wrong for
-                        # other val. clone it to preserve that vk
-                        # in snode.vk12dic
                         sub_vk12dic[vk.kname] = vk.clone()
             # print(f'child-{val}')
             tnode = TNode(sub_vk12dic, snode, val)
@@ -95,15 +68,11 @@ class VKManager:
                 chs[val] = tnode
         # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
         self.make_bdic()  # bdic made here will be used for .next/bestchoice
-        return chs  # for making chdic with tnodes
+        return vk3dic, chs  # for making chdic with tnodes
     # enf of def morph()
 
     def bestchoice(self):
-        ''' return: {(kn1,kn2): set([tkn1, tkn2,..]),'bits': bits}
-            (kn1,kn2) are the vks (with kn1, kn2 names) sit on same *.bits,
-            bits: the 3 bits kn1 and kn2 commonly sit on
-            set([tkn1,..]): set of kns/vks that have 1 or 2 bit(s) in bits
-            '''
+        "return: {'bestkey': (tkn1, tkn2,),'bits': bits[,,],'touched':[,,..,]}"
         best_choice = None
         max_tsleng = -1
         max_tcleng = -1
