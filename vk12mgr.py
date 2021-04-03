@@ -53,8 +53,9 @@ class VK12Manager:
         for kn in kns:
             if kn in self.kn1s:
                 vk1 = self.vkdic[kn]
-                if self.debug:
+                if self.debug and bit != vk1.bits[0]:
                     print(f'bit: {bit} vs. {vk1.bits[0]}')
+                    raise Exception("bit conflict")
                 if vk1.bits[0] != bit:
                     debug = 1
                 # if self.vkdic[kn].dic[bit] != vk.dic[bit]:
@@ -80,6 +81,9 @@ class VK12Manager:
                             print(self.info[-1])
                         self.remove_vk2(kn)
                     else:  # vk2 has diff val on this bit
+                        self.info.append(f'{vk.kname} made {kn} vk1 ')
+                        if self.debug:
+                            print(self.info[-1])
                         # remove vk2
                         # drop bit from it(it becomes vk1)
                         # add it back as vk1
@@ -107,6 +111,9 @@ class VK12Manager:
                     return False
                 else:  # vk1 has diff value on this bit
                     # drop this bit, this vk1 becomes vk1. Add this vk1
+                    self.info.append(f'{kn} makes {vk.kname} vk1')
+                    if self.debug:
+                        print(self.info[-1])
                     vk.drop_bit(b)
                     return self.add_vk(vk)
         # find vk2s withsame bits
@@ -119,15 +126,17 @@ class VK12Manager:
             pvk = self.vkdic[pk]
             if vk.dic[bs[0]] == pvk.dic[bs[0]]:
                 if vk.dic[bs[1]] == pvk.dic[bs[1]]:
-                    self.info.append(f'{vk.kname} douplicates {kn}')
+                    self.info.append(f'{vk.kname} douplicates {kn}. not added')
                     if self.debug:
                         print(self.info[-1])
                     return False  # vk not added
                 else:  # b0: same value, b1 diff value
                     msg = f'{vk.kname} + {pvk.kname}: {pvk.kname}->vk1'
                     self.info.append(msg)
+                    self.info.append(f'{vk.kname} not added')
                     if self.debug:
                         print(self.info[-1])
+                        print(self.info[-2])
                     # remove pvk
                     self.remove_vk2(pvk.kname)
                     pvk.drop_bit(bs[1])
@@ -138,8 +147,10 @@ class VK12Manager:
                     # b1 has the same value
                     msg = f'{vk.kname} + {pvk.kname}: {pvk.kname}->vk1'
                     self.info.append(msg)
+                    self.info.append(f'{vk.kname} not added')
                     if self.debug:
                         print(self.info[-1])
+                        print(self.info[-2])
                     # remove pvk
                     self.remove_vk2(pvk.kname)
                     # add pvk back as vk1, after dropping bs[1]

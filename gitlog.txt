@@ -1,3 +1,5 @@
+2021-04-02->0.187
+- refactor vk12m.add_vk, info more complete.
 2021-04-02->0.186
 - solver11 -> solver12
 - satholder.reduce make .next_sh, and shorten sh to be 3 loog 
