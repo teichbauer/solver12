@@ -1,3 +1,9 @@
+2021-04-02->0.188
+- fix in vkgrm. old 12.2->12.4,12.3->12.5,12.4->12.2, 12.5->12.3
+  9.2->9.1,9.1->9.2,9.5->9.6,9.6->9.5
+  But all vkm.vk12dic are fine(the same as before)
+- TBD: what snode.nov, vkmgr.nov now should mean? Because all vks now arenever 
+  shortened?
 2021-04-02->0.187
 - refactor vk12m.add_vk, info more complete.
 2021-04-02->0.186
