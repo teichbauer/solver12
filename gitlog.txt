@@ -1,3 +1,12 @@
+
+2021-04-03->0.189
+- refactored tnode.check_sat - it 1.check if sdic is blocked by local vkdic, and
+  2. if not blocked, filter out some vk from vkdic, return the residue vkdic.
+  tnode.find_path_vk12m now has input vkdic. no more need bmap
+- vklause.partial_hit_residue modified: no more need bit_txmap, and now also
+  covers total hit(blocking hit)
+- clean up vkmgr a bit
+- pathmanager constructor: changed case when parent is top-level.
 2021-04-02->0.188
 - fix in vkgrm. old 12.2->12.4,12.3->12.5,12.4->12.2, 12.5->12.3
   9.2->9.1,9.1->9.2,9.5->9.6,9.6->9.5

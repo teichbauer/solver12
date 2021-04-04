@@ -30,9 +30,12 @@ class PathManager:
         hp_chdic = tnode.holder.parent.chdic
         if tnode.holder.parent.is_top():  # holder.parent: a top-level snode
             for va, tn in hp_chdic.items():
-                if tn.check_sat(tnode.hsat, True):
-                    vk12m = tnode.find_path_vk12m(tn)
-                    if vk12m.valid:
+                tn_vk12_residue_vkdic = tn.check_sat(tnode.hsat)
+                # if tnode.hsat not allowed by tn, return value is None
+                # otherwise, it is a vk12dic from tn, filtered by tnode.hsat
+                if tn_vk12_residue_vkdic != None:
+                    vk12m = tnode.find_path_vk12m(tn_vk12_residue_vkdic)
+                    if vk12m:
                         names = [tn.name]
                         if final:
                             self.finalize(vk12m, names)

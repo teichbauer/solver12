@@ -12,22 +12,20 @@ class VKManager:
 
     def clone(self):
         vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
-        return VKManager(vkdic, self.nov, True)
+        vkm = VKManager(vkdic, self.nov)
+        vkm.bdic = {b: s.copy() for b, s in self.bdic.items()}
 
     def printjson(self, filename):
         print_json(self.nov, self.vkdic, filename)
 
     def make_bdic(self):
-        self.bdic = {b: set([]) for b in range(self.nov)}
+        self.bdic = {}
         for kn, vk in self.vkdic.items():
             for b in vk.dic:
+                if b not in self.bdic:      # hope this is faster than
+                    self.bdic[b] = set([])  # bdic.setdefault(b,set([]))
                 self.bdic[b].add(kn)
 
-    def txed_clone(self, tx):
-        vkdic = tx.trans_vkdic(self.vkdic)
-        return VKManager(vkdic, self.nov)
-
-    # def morph(self, snode, vk12dic):
     def morph(self, snode):
         '''             '''
         chs = {}  # {<cvr-val>: {kn, ..},..}
@@ -69,7 +67,7 @@ class VKManager:
         # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
         self.make_bdic()  # bdic made here will be used for .next/bestchoice
         # for making chdic with tnodes
-        return VKManager(vk3dic, self.nov, True), chs
+        return VKManager(vk3dic, self.nov - 3, True), chs
     # enf of def morph()
 
     def bestchoice(self):

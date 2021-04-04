@@ -15,22 +15,20 @@ class TNode:
         self.hsat = holder_snode.sh.get_sats(val)
         self.vkm = VK12Manager(self.sh.ln, vk12dic)
 
-    def check_sat(self, sdic, reverse_sh=False):
-        if reverse_sh:
-            return verify_sat(self.vkm.vkdic, self.sh.reverse_sdic(sdic))
-        return verify_sat(self.vkm.vkdic, sdic)
+    def check_sat(self, sdic):
+        vk12dic = {}
+        for kn, vk in self.vkm.vkdic.items():
+            total_hit, vk12 = vk.partial_hit_residue(sdic)
+            if total_hit:
+                return None
+            elif vk12:
+                vk12dic[kn] = vk12
+        return vk12dic
 
-    def find_path_vk12m(self, ptnode):
-        bmap = ptnode.sh.bit_tx_map(self.sh)
-        # bit-names(sh) of self.vkm.vk to that of parent-level bit-names(sh)
-        ksat = ptnode.sh.reverse_sdic(self.hsat)
+    def find_path_vk12m(self, pnode_leftover_vk12dic):
         vk12m = self.vkm.clone()  # use a clone, don't touch self.vkm.vks
-        # VK12Manager(self.holder.nov)
-        # adding all vk-residues from ptnode (vk cut by hsat) to vk12m
-        for kn, pvk in ptnode.vkm.vkdic.items():
-            vk12 = pvk.partial_hit_residue(ksat, bmap)
-            if vk12:
-                vk12m.add_vk(vk12)
-                if not vk12m.valid:
-                    break
+        for kn, vk12 in pnode_leftover_vk12dic.items():
+            vk12m.add_vk(vk12)
+            if not vk12m.valid:
+                return None
         return vk12m

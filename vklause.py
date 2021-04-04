@@ -102,20 +102,8 @@ class VKlause:
                     hit_cnt += 1
             return hit_cnt == self.nob
 
-    def partial_hit_residue(self, sdic, bit_txmap):
-        ''' test self is partially hit by sdic (total hit would be
-            a bug: it wouldnt be in the candi-tnode).
-            For each bit in self.dic:
-                transfer bit to v = sh(bit):
-                if v is in sdic:
-                    if self.dic[bit] != sdic[bit]
-                        return None - this vk is not (partially) hit
-                    else: dont put this bit/value into td{}
-                else(v not in sdic):
-                    put into td{}: td[bit] = value
-            At the end, if td empty: return None
-            if td not empty build a new VKlause from td, return it
-            '''
+    def partial_hit_residue(self, sdic):
+        total_hit = False
         td = {}
         for bit, value in self.dic.items():
             # v = sh.varray[bit]
@@ -123,24 +111,11 @@ class VKlause:
                 # one mis-match enough makes it not-hit.
                 # if not-hit, tdic(empty or not) not used
                 if value != sdic[bit]:
-                    return None
+                    return False, None
             else:
                 td[bit] = value
-        # getting here means this vk hit in dic-range. And it
-        # must be a pratial-hit: outside bit (tdic) must exist
         if len(td) == 0:
-            raise Exception(f'vk {self.kname} wrong in this candi-path!')
+            total_hit = True
         else:
-            tmpd = {}
-            for bit, value in td.items():
-                if bit not in bit_txmap:
-                    raise Exception("bit-tx-map error")
-                tx_bit = bit_txmap[bit]
-                if tx_bit in sdic:
-                    if td[bit] != sdic[tx_bit]:
-                        return None
-                else:
-                    tmpd[tx_bit] = td[bit]
-            if len(tmpd) == 0:
-                return None
-            return VKlause(self.kname, tmpd, len(bit_txmap))
+            vk12 = VKlause(self.kname, td, self.nov)
+        return total_hit, vk12
