@@ -104,6 +104,7 @@ class VKlause:
 
     def partial_hit_residue(self, sdic):
         total_hit = False
+        vk12 = None
         td = {}
         for bit, value in self.dic.items():
             # v = sh.varray[bit]

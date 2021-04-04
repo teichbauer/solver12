@@ -1,4 +1,7 @@
-
+2021-04-03->0.190
+- minor fix in vklause
+- recode pathmgr constructor for case when parent isn't top level
+- tnode.filter_path, will replace find_path_vk12m and pathmgr.extend_vkm
 2021-04-03->0.189
 - refactored tnode.check_sat - it 1.check if sdic is blocked by local vkdic, and
   2. if not blocked, filter out some vk from vkdic, return the residue vkdic.
