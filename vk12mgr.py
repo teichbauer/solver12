@@ -1,5 +1,5 @@
 from vklause import VKlause
-from basics import display_vkdic, topbits, oppo_binary, topbits_coverages
+from basics import display_vkdic, get_bit, oppo_binary
 from TransKlauseEngine import TxEngine
 
 
@@ -176,53 +176,52 @@ class VK12Manager:
 
     def pick_bvk(self):
         if len(self.kn1s) > 0:
-            # pick the one with top-bit. Or the first one
-            i = 0
-            vk = self.vkdic[self.kn1s[i]]
-            while i < len(self.kn1s) and vk.bits[0] != self.nov - 1:
-                i += 1
-                if i < len(self.kn1s):
-                    vk = self.vkdic[self.kn1s[i]]
-            return vk
+            return self.vkdic[self.kn1s[0]]
         else:
-            # pick the vk2 with max bit-sum
-            kn = self.kn2s[0]
-            if len(self.kn2s) > 1:
-                bsum = sum(self.vkdic[kn].bits)
-                for kx in self.kn2s[1:]:
-                    xsum = sum(self.vkdic[kx].bits)
-                    if bsum < xsum:
-                        kn = kx
-                        bsum = xsum
-            return self.vkdic[kn]
+            return self.vkdic[self.kn2s[0]]
 
-    def morph(self, n12, nob):
+    def morph(self, n12):
         n12.vk12dic = {}
         chs = {}
         excl_cvs = set([])
-        self.nov -= nob  # top nob bit(s) will be cut off
-
+        allvalues = set(range(2**n12.sh.ln))
         tdic = {}
-        for kn, vk in self.vkdic.items():
-            cvr, odic = topbits_coverages(vk, n12.topbits)
-            vk12 = vk.clone(n12.topbits)  # if no bit left: vk12 == None
-            if not vk12:  # vk is within topbits, no bit left
-                for v in cvr:  # collect vk's cover-value
-                    excl_cvs.add(v)
-            else:  # a non-empty vk12 exists, with bits outside topbits
-                n12.vk12dic[kn] = vk12
-                tdic.setdefault(tuple(cvr), []).append(vk12)
 
-        for val in range(2 ** nob):
+        for kn, vk in self.vkdic.items():
+            bs = vk.bits[:]
+            out_bits = set(bs) - set(n12.sh.varray)
+            if len(out_bits) == 0:
+                if vk.nob == n12.sh.ln:
+                    excl_cvs.add(vk.compressed_value())
+                elif vk.hit(n12.hsat):
+                    raise Exception(f'Wrong vk: {vk.kname}')
+                else:
+                    pass  # drop this vk
+            elif len(out_bits) == vk.nob:
+                # vk is totally outside of sh
+                tdic[tuple(allvalues)] = vk
+            else:
+                # vk divided: in sh 1 bit, out 1 bit
+                outb = out_bits.pop()
+                vk12 = VKlause(vk.kname, {outb: vk.dic[outb]}, vk.nov)
+                bs.remove(outb)  # bs now has only 1 of vk that is in sh
+                in_index = n12.sh.varray.index(bs[0])
+                vs = []
+                for v in allvalues:
+                    if get_bit(v, in_index) == vk.dic[bs[0]]:
+                        vs.append(v)
+                tdic.setdefault(tuple(vs), []).append(vk12)
+
+        for val in allvalues:
             if val in excl_cvs:
                 continue
             sub_vk12dic = {}
             for cvr in tdic:
-                if val in cvr:  # touched kn/kv does have outside bit
+                if val in cvr:  # kv does have outside bit
                     vks = tdic[cvr]
                     for vk in vks:
-                        sub_vk12dic[vk.kname] = vk
-            vkm = VK12Manager(self.nov, sub_vk12dic)
+                        sub_vk12dic[vk.kname] = vk.clone()
+            vkm = VK12Manager(self.nov - n12.sh.ln, sub_vk12dic)
             if vkm.valid:
                 node = n12.__class__(
                     val,                   # node12.val = val

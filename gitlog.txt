@@ -1,3 +1,9 @@
+2021-04-05->0.192
+- minor fix in tnode.filter_paths
+- node12.spawn: not using tx any more. use sh.reduce
+- vk12mgr: pick_bvk: just pick first vk1, if exists, or first vk2
+  since there is no tx to be done any more.
+- vk12m.morph recoding - need more testing.
 2021-04-04->0.191
 - fix in tnode
 2021-04-03->0.190

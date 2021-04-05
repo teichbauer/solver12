@@ -39,6 +39,7 @@ class SatHolder:
         return SatHolder(varray)
 
     def reduce_vk(self, vk):
+        ''' return: vk12, vk3, cvr '''
         hit_bits = set(self.varray).intersection(set(vk.bits))
         ln = len(hit_bits)
         if ln == 0:  # vk is totally outside of sh
@@ -66,6 +67,21 @@ class SatHolder:
             if covered:
                 cvs.add(val)
         return vk12, None, list(cvs)
+
+    # def reduce_vk12(self, vk):
+    #     allvalues = set(range(2**self.ln))
+    #     hit_bits = set(self.varray).intersection(set(vk.bits))
+    #     ln = len(hit_bits)
+    #     if ln == 0:
+    #         return vk.clone(), allvalues
+    #     else:
+    #         total_hit, vk12 = vk.partial_hit_residue()
+
+    #     elif ln == vk.nob:
+    #         return None, vk.compressed_value()
+    #     else:
+    #         for b, v in vk.dic.items():
+    #             if b in hit_bits:
 
     def next_sat(self, gen):
         d = {}

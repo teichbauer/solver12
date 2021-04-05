@@ -27,7 +27,6 @@ class VKManager:
                 self.bdic[b].add(kn)
 
     def morph(self, snode):
-        '''             '''
         chs = {}  # {<cvr-val>: {kn, ..},..}
         excl_cvs = set([])
         kns = list(self.vkdic.keys())

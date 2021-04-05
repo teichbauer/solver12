@@ -83,19 +83,10 @@ class Node12:
 
     def spawn(self):
         self.bvk = self.vkmgr.pick_bvk()
-        self.topbits = topbits(self.nov, self.bvk.nob)
-        if self.bvk.bits != self.topbits:  # tx needed?
-            self.tx = TxEngine(self.bvk)
-            self.sh.transfer(self.tx)
-            tx_vkdic = self.tx.trans_vkdic(self.vkmgr.vkdic)
-        else:
-            tx_vkdic = self.vkmgr.vkdic
-        self.tail_varray = self.sh.spawn_tail(self.bvk.nob)
-        self.next_sh = SatHolder(self.tail_varray[:])
-        self.sh.cut_tail(self.bvk.nob)
+        self.next_sh = self.sh.reduce(self.bvk.bits)
 
         # generate dic of Node12 instances, keyed by val
-        self.chdic = self.vkmgr.morph(self, self.bvk.nob)
+        self.chdic = self.vkmgr.morph(self)
 
         vals = list(self.chdic.keys())
         for val in vals:

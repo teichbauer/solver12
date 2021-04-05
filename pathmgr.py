@@ -56,34 +56,6 @@ class PathManager:
                         self.finalize(vkm, pname)
                     else:
                         self.dic[pname] = vkm
-            # ----------------------------------------------
-            # for va, tn in hp_chdic.items():
-            #     sdic = tnode.hsat
-            #     pths = tn.pthmgr.verified_paths(sdic)
-            #     ks = list(pths.keys())
-            #     if self.debug:
-            #         print(f'{len(ks)} path-keys: {ks}')
-            #     x = 1
-            #     for key, vkm in pths.items():
-            #         # print(f'proccessing {key}')
-            #         msg = f'{tnode.name}-{key}'
-            #         if msg == "54.1-('57.2', '60.1')":
-            #             debug = 1
-            #         elif msg == "54.0-('57.3', '60.6')":
-            #             debug = 1
-            #         if self.debug:
-            #             print(f'extend-vkm for {msg}')
-            #             display_vkdic(tnode.vkm.vkdic,
-            #                           f'vkdic of tnode: {tnode.name}')
-            #             display_vkdic(vkm.vkdic, 'adding vkdic')
-            #         vk12m = self.extend_vkm(tn.sh, vkm)
-            #         path_name = list(key)
-            #         if vk12m.valid:
-            #             if final:
-            #                 self.finalize(vk12m, path_name)
-            #             else:
-            #                 path_name.insert(0, tnode.name)
-            #                 self.dic[tuple(path_name)] = vk12m
 
     def verified_paths(self, sdic):
         valid_paths = {}
