@@ -45,7 +45,7 @@ class TNode:
                     pvkm.add_vk(vk12)
                     if not pvkm.valid:
                         break
-            if not total_hit:
+            if (not total_hit) and len(pvkm.vkdic) > 0:
                 pname = list(pthname)
                 pname.insert(0, self.name)
                 pathdic[tuple(pname)] = pvkm

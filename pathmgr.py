@@ -49,7 +49,7 @@ class PathManager:
                 # debug info print out
                 ks = list(pathdic.keys())
                 if self.debug:
-                    print(f'{len(ks)} path-keys: {ks}')
+                    print(f'{tnode.name}+{tn.name} path-keys: {ks}')
 
                 for pname, vkm in pathdic.items():
                     if final:
