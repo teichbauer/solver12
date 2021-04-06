@@ -1,3 +1,11 @@
+2021-04-06->0.194
+- get rid of restrict
+- clean up satholder, of many unused methods
+- clean up basics of many unused functions
+- clean up pathmanager of unused methods: verify_paths, extend_vkm
+- node12.collect_sat: when it has hsat of length 3, it is a duplicate of its
+  tnode-parent. Dont collect that, it will be collected in tnode-loop.
+- minor fix in vk12m
 2021-04-05->0.193
 - delete TransKlauseEngine
 - recode node12.check_done. TBD: node12.collect_sat 

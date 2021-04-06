@@ -1,5 +1,3 @@
-from basics import verify_sat, oppo_binary
-from restrict import Restrict
 from vk12mgr import VK12Manager
 
 

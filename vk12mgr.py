@@ -1,10 +1,10 @@
 from vklause import VKlause
-from basics import display_vkdic, get_bit, oppo_binary
+from basics import get_bit, oppo_binary
 
 
 class VK12Manager:
-    debug = True
-    # debug = False
+    # debug = True
+    debug = False
 
     def __init__(self, nov, vkdic=None, raw=False):
         self.nov = nov
@@ -183,7 +183,8 @@ class VK12Manager:
         n12.vk12dic = {}
         chs = {}
         excl_cvs = set([])
-        allvalues = set(range(2**n12.sh.ln))
+        # all possible values: for 2 bits:(0,1,2,3); for 1 bit: (0,1)
+        allvalues = [(0, 1), (0, 1, 2, 3)][n12.sh.ln == 2]
         tdic = {}
 
         for kn, vk in self.vkdic.items():
@@ -198,7 +199,7 @@ class VK12Manager:
                     pass  # drop this vk
             elif len(out_bits) == vk.nob:
                 # vk is totally outside of sh
-                tdic[tuple(allvalues)] = vk
+                tdic.setdefault(allvalues, []).append(vk)
             else:
                 # vk divided: in sh 1 bit, out 1 bit
                 outb = out_bits.pop()

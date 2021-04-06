@@ -78,14 +78,19 @@ class Node12:
                     self.collect_sat(ts)
             else:
                 sat = tsat.copy()
-                sat.update(self.hsat)
+                if len(self.hsat) < 3:
+                    # if hsat has 3, it is duplicate of its parent /tnode
+                    # that will be collected in the following while loop
+                    sat.update(self.hsat)
                 if isinstance(self.parent, Node12):
                     self.parent.collect_sat(sat)
                 else:  # parent is PathManager with a class-var(list).sats
                     pthnames = self.path_name[:]
-                    while len(pthnames) > 0:
-                        tn = TNode.repo[pthnames.pop(0)]
+                    i = 0
+                    while i < len(pthnames):
+                        tn = TNode.repo[pthnames[i]]
                         sat.update(tn.hsat)
+                        i += 1
                     self.parent.sats.append(sat)
 
     def spawn(self):

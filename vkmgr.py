@@ -1,4 +1,4 @@
-from basics import topbits_coverages, print_json
+from basics import print_json
 from vklause import VKlause
 from tnode import TNode
 

@@ -1,4 +1,4 @@
-from basics import topbits, print_json
+from basics import print_json
 from satholder import SatHolder
 from tnode import TNode
 from pathmgr import PathManager
@@ -32,8 +32,9 @@ class SatNode:
         # after tx_vkm.morph, tx_vkm only has (.vkdic) vk3 left, if any
         # and tx_vkm.nov decreased by 3, used in spawning self.next
         self.tx_vkm, self.chdic = self.vkm.morph(self)
-        ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
-        print(f'keys: {ks}')
+        if self.debug:
+            ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
+            print(f'keys: {ks}')
         self.make_paths()
     # end of def prepare(self):
 
