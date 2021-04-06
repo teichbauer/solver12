@@ -1,3 +1,6 @@
+2021-04-05->0.193
+- delete TransKlauseEngine
+- recode node12.check_done. TBD: node12.collect_sat 
 2021-04-05->0.192
 - minor fix in tnode.filter_paths
 - node12.spawn: not using tx any more. use sh.reduce

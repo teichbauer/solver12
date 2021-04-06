@@ -1,6 +1,5 @@
 from vklause import VKlause
 from basics import display_vkdic, get_bit, oppo_binary
-from TransKlauseEngine import TxEngine
 
 
 class VK12Manager:

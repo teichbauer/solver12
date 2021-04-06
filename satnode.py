@@ -1,7 +1,5 @@
 from basics import topbits, print_json
 from satholder import SatHolder
-from TransKlauseEngine import TxEngine
-# from endnodemgr import EndNodeManager
 from tnode import TNode
 from pathmgr import PathManager
 

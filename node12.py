@@ -1,5 +1,4 @@
-from basics import topbits, filter_sdic, oppo_binary
-from TransKlauseEngine import TxEngine
+from basics import oppo_binary
 from vk12mgr import VK12Manager
 from satholder import SatHolder
 from tnode import TNode
@@ -33,31 +32,39 @@ class Node12:
             vk = list(self.vkmgr.vkdic.values())[0]
             if vk.nob == 1:
                 b = vk.bits[0]
-                v = vk.dic[b]
-                d = {self.sh.varray[b]: oppo_binary(v)}
                 for v in self.sh.varray:
-                    if v in d:
-                        self.tsat[v] = d[v]
+                    if v == b:
+                        self.tsat[v] = oppo_binary(vk.dic[b])
                     else:
                         self.tsat[v] = 2
                 return True
             else:   # vk.nob == 2
                 b0, b1 = vk.bits
-                var0 = self.sh.varray[b0]
-                var1 = self.sh.varray[b1]
-                value0 = vk.dic[b0]
-                value1 = vk.dic[b1]
+                # make 2 dicts: d0 and d1, so that
+                # vk.hit(d0) == Flase, vk.hit(d1) == False
+                d0 = vk.dic.copy()
+                d0[b0] = oppo_binary(vk.dic[b0])  # twist b0-value
+                d1 = vk.dic.copy()
+                d1[b1] = oppo_binary(vk.dic[b1])  # twist b1-value
+                # sat0: if hit b0/b1 take values from d0. otherwise value=2
                 tsat0 = {}
                 for v in self.sh.varray:
-                    if v == var0:
-                        tsat0[v] = oppo_binary(value0)
-                    elif v == var1:
-                        tsat[v] = value1
+                    if v == b0:
+                        tsat0[v] = d0[v]
+                    elif v == b1:
+                        tsat0[v] = d0[v]
                     else:
-                        tsat[v] = 2
-                tsat1 = tsat0.copy()
-                tsat1[var0] = value0
-                tsat1[var1] = oppo_binary(value1)
+                        tsat0[v] = 2
+                # sat1: if hit b0/b1 take values from d1. otherwise value=2
+                tsat1 = {}
+                for v in self.sh.varray:
+                    if v == b0:
+                        tsat1[v] = d1[v]
+                    elif v == b1:
+                        tsat1[v] = d1[v]
+                    else:
+                        tsat1[v] = 2
+
                 self.tsat = [tsat0, tsat1]
                 return True
         return False
