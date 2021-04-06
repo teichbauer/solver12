@@ -1,3 +1,5 @@
+2021-04-06->0.196
+- simplify node12: remove .nov, .val
 2021-04-06->0.195
 - minor change in node12
 2021-04-06->0.194

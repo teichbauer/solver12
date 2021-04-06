@@ -5,21 +5,19 @@ from tnode import TNode
 
 
 class Node12:
-    def __init__(self, val, parent, sh, hsat, vkm=None):
+    def __init__(self, parent, sh, hsat, vkm=None):
         self.parent = parent
         self.hsat = hsat
-        self.nov = sh.ln
         if vkm:
             self.vkmgr = vkm
         else:
-            self.vkmgr = VK12Manager(self.nov)
-        self.val = val
+            self.vkmgr = VK12Manager(sh.ln)
         self.chdic = {}
         self.sh = sh
         self.done = self.check_done()
 
     def check_done(self):
-        if self.nov == 0:
+        if self.sh.ln == 0:
             return True
         ln = len(self.vkmgr.vkdic)
         if ln == 0:

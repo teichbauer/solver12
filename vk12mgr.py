@@ -224,10 +224,9 @@ class VK12Manager:
             vkm = VK12Manager(self.nov - n12.sh.ln, sub_vk12dic)
             if vkm.valid:
                 node = n12.__class__(
-                    val,                   # node12.val = val
-                    n12,                   # n12 is parent-node
-                    n12.next_sh,           # sh
-                    n12.sh.get_sats(val),  # val -> hsat, based on topbits
+                    n12,               # n12 is parent-node
+                    n12.next_sh,       # sh
+                    n12.sh.get_sats(val),  # val -> hsat
                     vkm)
                 chs[val] = node
         return chs  # for making chdic with tnodes

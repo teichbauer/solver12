@@ -53,12 +53,8 @@ class PathManager:
                         self.dic[pname] = vkm
 
     def finalize(self, vkm, pathname):
-        n12 = Node12(
-            self.tnode.val,
-            self,
-            self.tnode.sh.clone(),
-            self.tnode.hsat,
-            vkm)
+        n12 = Node12(self, self.tnode.sh.clone(),
+                     self.tnode.hsat, vkm)
         n12.path_name = pathname
         if n12.done:
             n12.collect_sat()
