@@ -32,6 +32,9 @@ class SatNode:
         # after tx_vkm.morph, tx_vkm only has (.vkdic) vk3 left, if any
         # and tx_vkm.nov decreased by 3, used in spawning self.next
         self.tx_vkm, self.chdic = self.vkm.morph(self)
+        if self.tx_vkm == None and self.chdic == None:
+            self.conclude()
+
         if self.debug:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
@@ -83,6 +86,10 @@ class SatNode:
                 # recursive call of parent.trim_chs
                 higher_vals_inuse = set([])
                 for tn in self.chdic.values():
-                    vs = [int(k.split('-')[1]) for k in tn.pthmgr.dic]
+                    vs = [int(k[1].split('.')[1]) for k in tn.pthmgr.dic]
                     higher_vals_inuse.update(vs)
                 self.parent.trim_chs(higher_vals_inuse)
+
+    def conclude(self):
+        self.done = True
+        pass

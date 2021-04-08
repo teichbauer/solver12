@@ -1,5 +1,9 @@
 2021-04-08->0.198
-- fix in vk12mgr.add_vk2
+- fix in snode.trim_chs
+- cfg60-266 reached nov21, when there is only 1 vk3 (C0225{54:0, 50:0, 11:1}),
+  and now I have to treat this case: stop in vkm.morph, snode.conclude(): TBD.
+- there seem to be more paths/tnodes than there should be - trim_chs needs some
+  rework?
 2021-04-07->0.197
 - a tough fix in vk12m,add_vk1: kns is a clone of the list from bdic.
   But in the for kn in kns loop, this list may have been updated, so that

@@ -48,6 +48,9 @@ class VKManager:
                     excl_cvs.add(cvr)
             if vk12:
                 tdic.setdefault(tuple(vk12.cvr), []).append(vk12)
+
+        if len(tdic) == 0:
+            return None, None
         # 2**3 == 8 - number of possible children of the satnoe,
         for val in range(8):
             if val in excl_cvs:
