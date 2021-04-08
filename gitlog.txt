@@ -1,3 +1,8 @@
+2021-04-07->0.197
+- a tough fix in vk12m,add_vk1: kns is a clone of the list from bdic.
+  But in the for kn in kns loop, this list may have been updated, so that
+  the loop var kn be no more in this list. If that happens: jump over it.
+  Did a similar fix for add_vk2 - a cautious check.
 2021-04-06->0.196
 - simplify node12: remove .nov, .val
 2021-04-06->0.195

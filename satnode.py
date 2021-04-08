@@ -1,4 +1,4 @@
-from basics import print_json
+from basics import print_json, display_vkdic
 from satholder import SatHolder
 from tnode import TNode
 from pathmgr import PathManager

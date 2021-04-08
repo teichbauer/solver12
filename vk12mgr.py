@@ -51,6 +51,8 @@ class VK12Manager:
         kns = knames[:]  # kns for loop:can't use knames, for it may change.
         for kn in kns:
             if kn in self.kn1s:
+                if kn not in self.bdic[bit]:  # bdic may have been updated, so
+                    continue  # kn may no more be in there on this bit any more
                 vk1 = self.vkdic[kn]
                 if self.debug and bit != vk1.bits[0]:
                     print(f'bit: {bit} vs. {vk1.bits[0]}')
@@ -88,7 +90,7 @@ class VK12Manager:
                         # add it back as vk1
                         self.remove_vk2(kn)
                         vk2.drop_bit(bit)
-                        self.add_vk(vk2)
+                        self.add_vk1(vk2)
         # add the vk
         self.vkdic[vk.kname] = vk
         self.kn1s.append(vk.kname)
@@ -114,7 +116,7 @@ class VK12Manager:
                     if self.debug:
                         print(self.info[-1])
                     vk.drop_bit(b)
-                    return self.add_vk(vk)
+                    return self.add_vk1(vk)
         # find vk2s withsame bits
         pair_kns = []
         for kn in self.kn2s:
@@ -123,6 +125,8 @@ class VK12Manager:
         bs = vk.bits
         for pk in pair_kns:
             pvk = self.vkdic[pk]
+            if self.pvk.bits != vk.bits:  # pvk may have been modified, and
+                continue  # is no more a pair with vk. In that case, jump over
             if vk.dic[bs[0]] == pvk.dic[bs[0]]:
                 if vk.dic[bs[1]] == pvk.dic[bs[1]]:
                     self.info.append(f'{vk.kname} douplicates {kn}. not added')

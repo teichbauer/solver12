@@ -42,8 +42,8 @@ class PathManager:
                 pathdic = tnode.filter_paths(tn.pthmgr)
 
                 # debug info print out
-                ks = list(pathdic.keys())
                 if self.debug:
+                    ks = list(pathdic.keys())
                     print(f'{tnode.name}+{tn.name} path-keys: {ks}')
 
                 for pname, vkm in pathdic.items():
