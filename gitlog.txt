@@ -1,3 +1,5 @@
+2021-04-08->0.198
+- fix in vk12mgr.add_vk2
 2021-04-07->0.197
 - a tough fix in vk12m,add_vk1: kns is a clone of the list from bdic.
   But in the for kn in kns loop, this list may have been updated, so that

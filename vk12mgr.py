@@ -125,7 +125,7 @@ class VK12Manager:
         bs = vk.bits
         for pk in pair_kns:
             pvk = self.vkdic[pk]
-            if self.pvk.bits != vk.bits:  # pvk may have been modified, and
+            if pvk.bits != vk.bits:  # pvk may have been modified, and
                 continue  # is no more a pair with vk. In that case, jump over
             if vk.dic[bs[0]] == pvk.dic[bs[0]]:
                 if vk.dic[bs[1]] == pvk.dic[bs[1]]:
