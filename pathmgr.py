@@ -27,8 +27,8 @@ class PathManager:
             for va, tn in hp_chdic.items():
                 tn_vk12_residue_vkdic = tn.check_sat(tnode.hsat)
                 # if tnode.hsat not allowed by tn, return value is None
-                # otherwise, it is a vk12dic from tn, filtered by tnode.hsat
-                if tn_vk12_residue_vkdic != None:  # {} or {..} or None
+                # or, it is a vk12dic from tn, filtered by tnode.hsat
+                if tn_vk12_residue_vkdic != None:  # {} or {..}
                     vk12m = tnode.find_path_vk12m(tn_vk12_residue_vkdic)
                     if vk12m:
                         names = [tn.name]
@@ -37,7 +37,10 @@ class PathManager:
                         else:
                             names.insert(0, tnode.name)
                             self.dic[tuple(names)] = vk12m
-        else:  # holder.parent is not top-level snode, its tnodes has pthmgr
+                # else:   # tn_vk12_residue_vkdic == None
+                #   pass  # dump it
+        else:
+            # holder.parent is not top-level snode, its tnodes has pthmgr
             for va, tn in hp_chdic.items():
                 pathdic = tnode.filter_paths(tn.pthmgr)
 

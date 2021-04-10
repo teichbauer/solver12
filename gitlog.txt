@@ -1,3 +1,9 @@
+2021-04-10->0.199
+- changes in vkmgr
+- change in node12: vkm assigned always
+- SatNode has a class var snodes for debugging purpose. update_cnt. 
+  remove conclude
+- refactored tnode.
 2021-04-08->0.198
 - fix in snode.trim_chs
 - cfg60-266 reached nov21, when there is only 1 vk3 (C0225{54:0, 50:0, 11:1}),

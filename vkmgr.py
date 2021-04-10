@@ -49,8 +49,8 @@ class VKManager:
             if vk12:
                 tdic.setdefault(tuple(vk12.cvr), []).append(vk12)
 
-        if len(tdic) == 0:
-            return None, None
+        # if len(tdic) == 0:
+        #     return None, None
         # 2**3 == 8 - number of possible children of the satnoe,
         for val in range(8):
             if val in excl_cvs:
@@ -66,10 +66,13 @@ class VKManager:
             if tnode.vkm.valid:
                 TNode.repo[tnode.name] = tnode
                 chs[val] = tnode
-        # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
-        self.make_bdic()  # bdic made here will be used for .next/bestchoice
-        # for making chdic with tnodes
-        return VKManager(vk3dic, self.nov - 3, True), chs
+        if len(vk3dic) == 0:
+            return None, chs
+        else:
+            # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
+            self.make_bdic()  # make bdic to be used for .next/bestchoice
+            # for making chdic with tnodes
+            return VKManager(vk3dic, self.nov - 3, True), chs
     # enf of def morph()
 
     def bestchoice(self):

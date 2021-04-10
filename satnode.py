@@ -7,6 +7,7 @@ from pathmgr import PathManager
 class SatNode:
     debug = False
     maxnov = 0
+    snodes = {}
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent
@@ -18,26 +19,16 @@ class SatNode:
         self.done = False
         self.prepare()
 
-    def is_top(self):
-        return self.nov == SatNode.maxnov
-
-    def solve(self):
-        return PathManager.sats
-
     def prepare(self):
         self.choice = self.vkm.bestchoice()
         self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
-        # after tx_vkm.morph, tx_vkm only has (.vkdic) vk3 left, if any
-        # and tx_vkm.nov decreased by 3, used in spawning self.next
-        self.tx_vkm, self.chdic = self.vkm.morph(self)
-        if self.tx_vkm == None and self.chdic == None:
-            self.conclude()
-
+        self.tx_vkm, self.chdic = self.vkm.morph(self)  # tx_vkm: all vk3s
         if self.debug:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
+        SatNode.snodes[self.nov] = self
         self.make_paths()
     # end of def prepare(self):
 
@@ -54,7 +45,7 @@ class SatNode:
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode
             return
-        self.done = len(self.tx_vkm.vkdic) == 0
+        self.done = (self.tx_vkm == None) or len(self.tx_vkm.vkdic) == 0
         # collect higher-chs, and the ones being refed by this snode
         higher_vals_inuse = set([])
         dels = []   # for collecting tnode with no path
@@ -71,6 +62,8 @@ class SatNode:
             TNode.repo.pop(tnode.name)
         # clean-up higher-chs not being used by any tnode
         self.parent.trim_chs(higher_vals_inuse)
+        cnts = self.update_cnt()
+        x = 1
 
     def trim_chs(self, used_vals):
         ''' the chdic keys not in used_vals(a set), will be deleted. if this
@@ -90,6 +83,17 @@ class SatNode:
                     higher_vals_inuse.update(vs)
                 self.parent.trim_chs(higher_vals_inuse)
 
-    def conclude(self):
-        self.done = True
-        pass
+    def is_top(self):
+        return self.nov == SatNode.maxnov
+
+    def solve(self):
+        return PathManager.sats
+
+    def update_cnt(self):
+        cnts = {}
+        for nov, sn in SatNode.snodes.items():
+            if nov < SatNode.maxnov:
+                cnt = {v: len(tn.pthmgr.dic.keys())
+                       for v, tn in sn.chdic.items()}
+                cnts[nov] = cnt
+        return cnts

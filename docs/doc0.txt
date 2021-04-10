@@ -31,6 +31,11 @@ This problem is proven to be NP-complete.
 
 Those are the rules about 3 SAT-clause. 
 -------------------------------------------
+Suppose F is the product of m cluases
+
+    F = M
+
+
 I break F into several sub-Fs
 
     F = (G1 + G2 + ... + Gk)F1                 (f1)

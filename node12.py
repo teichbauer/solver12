@@ -8,10 +8,7 @@ class Node12:
     def __init__(self, parent, sh, hsat, vkm=None):
         self.parent = parent
         self.hsat = hsat
-        if vkm:
-            self.vkmgr = vkm
-        else:
-            self.vkmgr = VK12Manager(sh.ln)
+        self.vkmgr = vkm
         self.chdic = {}
         self.sh = sh
         self.done = self.check_done()

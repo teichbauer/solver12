@@ -32,17 +32,22 @@ class TNode:
         return vk12m
 
     def filter_paths(self, pathmgr):
+        total_hit = False
         pathdic = {}
         for pthname, vkm in pathmgr.dic.items():
-            pvkm = self.vkm.clone()
-            for kn, vk in vkm.vkdic.items():
-                total_hit, vk12 = vk.partial_hit_residue(self.hsat)
-                if total_hit:
-                    break
-                elif vk12:
-                    pvkm.add_vk(vk12)
-                    if not pvkm.valid:
+            if len(self.vkm.vkdic) > 0:
+                pvkm = self.vkm.clone()
+                for kn, vk in vkm.vkdic.items():
+                    total_hit, vk12 = vk.partial_hit_residue(self.hsat)
+                    if total_hit:
                         break
+                    elif vk12:
+                        pvkm.add_vk(vk12)
+                        if not pvkm.valid:
+                            break
+            else:  # self.vkm.vkdic is empty, take over vkm
+                pvkm = vkm  # dont need to clone(), pvkm will not be modified
+
             if (not total_hit) and pvkm.valid and len(pvkm.vkdic) > 0:
                 pname = list(pthname)
                 pname.insert(0, self.name)
