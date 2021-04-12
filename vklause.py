@@ -14,7 +14,7 @@ class VKlause:
         self.dic = dic  # { 7:1, 3: 0, 0: 1}, or {3:0, 1:1} or {3:1}
         self.nov = nov  # number of variables (here: 8) - bits of value space
         # all bits, in descending order
-        self.bits = sorted(list(dic.keys()), reverse=True)  # [7,3,0]
+        self.bits = sorted(dic.keys(), reverse=True)  # [7,3,0]
         # void bits of the nov-bits
         self.nob = len(self.bits)             # 1, 2 or 3
 

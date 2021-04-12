@@ -39,7 +39,7 @@ def get_sdic(filename):
 
 def ordered_dic_string(d):
     m = '{ '
-    ks = list(sorted(list(d.keys()), reverse=True))
+    ks = sorted(d.keys(), reverse=True)
     for k in ks:
         m += str(k) + ': ' + str(d[k]) + ', '
     m = m.strip(', ')

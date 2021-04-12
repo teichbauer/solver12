@@ -8,28 +8,35 @@ class SatNode:
     debug = False
     maxnov = 0
     snodes = {}
+    blkdics = []
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent
         self.sh = sh
         self.vkm = vkm
         self.nov = vkm.nov
-        self.sats = None
         self.next = None
         self.done = False
         self.prepare()
 
     def prepare(self):
         self.choice = self.vkm.bestchoice()
+        for bvkn in self.choice['bestkey']:
+            SatNode.blkdics.append(self.vkm.vkdic[bvkn].dic)
         self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         self.tx_vkm, self.chdic = self.vkm.morph(self)  # tx_vkm: all vk3s
+        self.done = (self.tx_vkm == None) or len(self.tx_vkm.vkdic) == 0
         if self.debug:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
         SatNode.snodes[self.nov] = self
-        self.make_paths()
+        if self.done:
+            novs = sorted(self.snodes.keys(), reverse=True)
+            for nov in novs[1:]:
+                SatNode.snodes[nov].make_paths()
+            cnts = self.update_cnt()
     # end of def prepare(self):
 
     def spawn(self):
@@ -45,7 +52,6 @@ class SatNode:
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode
             return
-        self.done = (self.tx_vkm == None) or len(self.tx_vkm.vkdic) == 0
         # collect higher-chs, and the ones being refed by this snode
         higher_vals_inuse = set([])
         dels = []   # for collecting tnode with no path
@@ -62,7 +68,7 @@ class SatNode:
             TNode.repo.pop(tnode.name)
         # clean-up higher-chs not being used by any tnode
         self.parent.trim_chs(higher_vals_inuse)
-        cnts = self.update_cnt()
+        # cnts = self.update_cnt()
         x = 1
 
     def trim_chs(self, used_vals):
