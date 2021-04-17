@@ -31,6 +31,16 @@ class VK12Manager:
         vk12m.vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
         return vk12m
 
+    def bset(self):
+        s1 = set([])
+        for b in self.bdic:
+            if len(self.bdic[b]) > 0:
+                s1.add(b)
+        return s1
+
+    def vk1s(self):
+        return [self.vkdic[kn] for kn in self.kn1s]
+
     def add_vkdic(self, vkdic):
         for vk in vkdic.values():
             self.add_vk(vk)

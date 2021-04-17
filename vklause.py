@@ -28,15 +28,12 @@ class VKlause:
         # bits2b_dropped: list of bits to be dropped.
         # They must be the top-bits
         dic = self.dic.copy()
-        new_nov = self.nov
         if bits2b_dropped and len(bits2b_dropped) > 0:
-            new_nov = self.nov - len(bits2b_dropped)
             for b in bits2b_dropped:
                 # drop off this bit from dic.
-                # None: in case b not in dic, it will not cause key-error
                 dic.pop(b, None)
         if len(dic):
-            return VKlause(self.kname, dic, new_nov)
+            return VKlause(self.kname, dic, self.nov)
         else:
             return None
 

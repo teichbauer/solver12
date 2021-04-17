@@ -1,3 +1,8 @@
+2021-04-16->0.201
+- SatNode offers a class var, collecting all anchor-vks, keyed by nov
+- tnode has a add_ancvks to use SatNode.anchor_vks
+- vklause.clone offers an option to drop bit
+- rename vkmgr/bestchoice to choose_anchor, bestkey -> ancs
 2021-04-12->0.200
 - simplifying: list(sorted(list(d.keys()), reverse=True)) simplified to be:
   sorted(d.keys(), reverse=True), in many places.
@@ -5,7 +10,7 @@
   {16:1,6:0,1:1}, and all from other snodes(nov-57,...nov-24). These dics
   should be used in pathManager, when adding vks into tn.pthmgr.dic?
   Need to be careful, and testing while implementing...
-  Added SatNode.blkdics=[{},{},..], preparing.
+  Added SatNode.anchor_dics=[{},{},..], preparing.
 2021-04-10->0.199
 - changes in vkmgr
 - change in node12: vkm assigned always

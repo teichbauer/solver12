@@ -70,13 +70,13 @@ class VKManager:
             return None, chs
         else:
             # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
-            self.make_bdic()  # make bdic to be used for .next/bestchoice
+            self.make_bdic()  # make bdic to be used for .next/choose_anchor
             # for making chdic with tnodes
             return VKManager(vk3dic, self.nov - 3, True), chs
     # enf of def morph()
 
-    def bestchoice(self):
-        "return: {'bestkey': (tkn1, tkn2,),'bits': bits[,,],'touched':[,,..,]}"
+    def choose_anchor(self):
+        "return: {'ancs': (tkn1, tkn2,),'bits': bits[,,],'touched':[,,..,]}"
         best_choice = None
         max_tsleng = -1
         max_tcleng = -1
@@ -128,9 +128,9 @@ class VKManager:
                     max_tcleng = ltcvk
                     best_bits = bits
         result = {
-            'bestkey': tuple(sorted(list(best_choice[0]))),
+            'ancs': tuple(sorted(list(best_choice[0]))),
             'touched': best_choice[1],
             'bits': best_bits
         }
         return result
-    # end of def bestchoice(self):
+    # end of def choose_anchor(self):

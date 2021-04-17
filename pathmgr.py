@@ -5,8 +5,8 @@ from node12 import Node12
 class PathManager:
     sats = []
     limit = 10
-    debug = False
-    # debug = True
+    # debug = False
+    debug = True
     ''' -----------------------------------------------------------------------
        Each tnode has self.pthmgr(instance of PathManager class), with *.dic:
          {<vkey>:<vkmgr>,...}, where <vkey> is concadinated key(hp isnt top):

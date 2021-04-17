@@ -5,10 +5,11 @@ from pathmgr import PathManager
 
 
 class SatNode:
-    debug = False
+    # debug = False
+    debug = True
     maxnov = 0
     snodes = {}
-    blkdics = []
+    anchor_vks = {}
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent
@@ -20,9 +21,10 @@ class SatNode:
         self.prepare()
 
     def prepare(self):
-        self.choice = self.vkm.bestchoice()
-        for bvkn in self.choice['bestkey']:
-            SatNode.blkdics.append(self.vkm.vkdic[bvkn].dic)
+        self.choice = self.vkm.choose_anchor()
+        for bvkn in self.choice['ancs']:
+            bvk = self.vkm.vkdic[bvkn]
+            SatNode.anchor_vks.setdefault(self.nov, []).append(bvk)
         self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
