@@ -3,8 +3,11 @@ from node12 import Node12
 
 
 class PathManager:
-    sats = []
-    limit = 10
+    # sats = []
+    # limit = 10
+    # ------------------
+    # snodes = {}
+    # anchor_vks = {}
     # debug = False
     debug = True
     ''' -----------------------------------------------------------------------

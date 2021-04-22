@@ -1,4 +1,6 @@
 from vk12mgr import VK12Manager
+from pathmgr import PathManager
+from center import Center
 
 
 class TNode:
@@ -63,7 +65,7 @@ class TNode:
         return pathdic
 
     def add_ancvks(self, vkm):
-        for nv, vks in self.holder.anchor_vks.items():
+        for nv, vks in Center.anchor_vks.items():
             if nv < self.holder.nov:
                 # for anc-vks(all vk3s) of the lower snodes:
                 # if any vk1 in vkm can make a anc-vk vk2

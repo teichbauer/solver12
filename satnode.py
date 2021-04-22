@@ -1,15 +1,13 @@
 from basics import print_json, display_vkdic
 from satholder import SatHolder
-from tnode import TNode
 from pathmgr import PathManager
+from center import Center
 
 
 class SatNode:
     # debug = False
     debug = True
     maxnov = 0
-    snodes = {}
-    anchor_vks = {}
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent
@@ -24,7 +22,7 @@ class SatNode:
         self.choice = self.vkm.choose_anchor()
         for bvkn in self.choice['ancs']:
             bvk = self.vkm.vkdic[bvkn]
-            SatNode.anchor_vks.setdefault(self.nov, []).append(bvk)
+            Center.anchor_vks.setdefault(self.nov, []).append(bvk)
         self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
@@ -33,11 +31,11 @@ class SatNode:
         if self.debug:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
-        SatNode.snodes[self.nov] = self
+        Center.snodes[self.nov] = self
         if self.done:
-            novs = sorted(self.snodes.keys(), reverse=True)
+            novs = sorted(Center.snodes.keys(), reverse=True)
             for nov in novs[1:]:
-                SatNode.snodes[nov].make_paths()
+                Center.snodes[nov].make_paths()
             cnts = self.update_cnt()
     # end of def prepare(self):
 
@@ -67,7 +65,7 @@ class SatNode:
         # clean-up ch-tnodes, if its pthmgr.dic is empty
         for tnode in dels:
             self.chdic.pop(tnode.val)
-            TNode.repo.pop(tnode.name)
+            Center.repo.pop(tnode.name, None)
         # clean-up higher-chs not being used by any tnode
         self.parent.trim_chs(higher_vals_inuse)
         # cnts = self.update_cnt()
@@ -82,7 +80,7 @@ class SatNode:
             for v in delta:
                 tn = self.chdic.pop(v, None)
                 if tn:
-                    TNode.repo.pop(tn.name)
+                    Center.repo.pop(tn.name, None)
             if self.parent:
                 # recursive call of parent.trim_chs
                 higher_vals_inuse = set([])
@@ -95,11 +93,11 @@ class SatNode:
         return self.nov == SatNode.maxnov
 
     def solve(self):
-        return PathManager.sats
+        return Center.sats
 
     def update_cnt(self):
         cnts = {}
-        for nov, sn in SatNode.snodes.items():
+        for nov, sn in Center.snodes.items():
             if nov < SatNode.maxnov:
                 cnt = {v: len(tn.pthmgr.dic.keys())
                        for v, tn in sn.chdic.items()}

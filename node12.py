@@ -1,7 +1,7 @@
 from basics import oppo_binary
 from vk12mgr import VK12Manager
 from satholder import SatHolder
-from tnode import TNode
+from center import Center
 
 
 class Node12:
@@ -78,7 +78,7 @@ class Node12:
                     self.parent.collect_sat(sat)
                 else:  # parent is PathManager with a class-var(list).sats
                     for tnname in self.path_name:
-                        tn = TNode.repo[tnname]
+                        tn = Center.repo[tnname]
                         sat.update(tn.hsat)
                     self.parent.sats.append(sat)
 

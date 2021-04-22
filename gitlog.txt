@@ -1,3 +1,6 @@
+2021-04-22->0.202
+- center for holding repositories: moving snodes, anchor_vks from SatNode,
+  repo from TNode, and sats from PathManager.
 2021-04-16->0.201
 - SatNode offers a class var, collecting all anchor-vks, keyed by nov
 - tnode has a add_ancvks to use SatNode.anchor_vks
