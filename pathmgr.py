@@ -1,5 +1,6 @@
 from vk12mgr import VK12Manager
 from node12 import Node12
+from center import Center
 
 
 class PathManager:

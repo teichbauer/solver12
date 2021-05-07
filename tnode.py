@@ -4,8 +4,6 @@ from center import Center
 
 
 class TNode:
-    # class-variable repo holds all tnode
-    repo = {}   # {<tnode>.name:<tnode-instance>,...}
 
     def __init__(self, vk12dic, holder_snode, val):
         self.val = val
