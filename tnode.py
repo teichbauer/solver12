@@ -38,23 +38,18 @@ class TNode:
         total_hit = False
         pathdic = {}
         for pthname, vkm in pathmgr.dic.items():
-            # if not pathmgr.anchor_verify(vkm.vkdic, pthname):
-            #     continue
-            if len(self.vkm.vkdic) > 0:
-                pvkm = self.vkm.clone()
-                if not self.add_ancvks(pvkm):
-                    # anc-vks make pvkm invalue -> go next pthname
-                    continue
-                for kn, vk in vkm.vkdic.items():
-                    total_hit, vk12 = vk.partial_hit_residue(self.hsat)
-                    if total_hit:
-                        break  # -> go next pthname
-                    elif vk12:
-                        pvkm.add_vk(vk12)
-                        if not pvkm.valid:
-                            break
-            else:  # self.vkm.vkdic is empty, take over vkm
-                pvkm = vkm  # dont need to clone(), pvkm will not be modified
+            pvkm = self.vkm.clone()
+            if not self.add_ancvks(pvkm):
+                # anc-vks make pvkm invalue -> go next pthname
+                continue
+            for kn, vk in vkm.vkdic.items():
+                total_hit, vk12 = vk.partial_hit_residue(self.hsat)
+                if total_hit:
+                    break  # -> go next pthname
+                elif vk12:
+                    pvkm.add_vk(vk12)
+                    if not pvkm.valid:
+                        break
 
             if (not total_hit) and pvkm.valid and len(pvkm.vkdic) > 0:
                 pname = list(pthname)

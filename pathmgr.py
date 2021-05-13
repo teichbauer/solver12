@@ -7,8 +7,6 @@ class PathManager:
     # sats = []
     # limit = 10
     # ------------------
-    # snodes = {}
-    # anchor_vks = {}
     # debug = False
     debug = True
     ''' -----------------------------------------------------------------------

@@ -1,3 +1,14 @@
+2021-05-12->0.204
+- found a bug!
+  60.2/vmk has a vk:C0051{8:1, 9:0}. 50.2/hsat:{39"0,20:1,9:0} reduced it
+  to C0051{8:1}. All the steps till here are okay. But, when 30.5/vkm.vkdic=={},
+  with 30.5/hsat{59:1, 42:0,8:1}, C0051.partial_hit_residue(hsat) should
+  return total_hit==True. But I did a direct assignment pvkm = vkm, without
+  doing C0051.partial_hit_residue(hsat) check.
+  fix: now regardless if self.vkm is empty or not, always do 
+  pvkm = self.vkm.clone(), then loop thru every vk in path-vkm, checking with
+  hsat. In this case C0051 will generate a total-hit, which would block this
+  30.5-33.2-36.6-39.7-42.7-45.5-48.6-51.2-54.1-60.2
 2021-05-07->0.203
 - new
 2021-04-22->0.202

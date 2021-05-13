@@ -110,6 +110,8 @@ class VKlause:
                 # if not-hit, tdic(empty or not) not used
                 if value != sdic[bit]:
                     return False, None
+                else:
+                    pass
             else:
                 td[bit] = value
         if len(td) == 0:
