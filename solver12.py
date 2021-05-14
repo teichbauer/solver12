@@ -1,6 +1,7 @@
 import sys
 import time
 from basics import get_sdic, ordered_dic_string, verify_sat
+from center import Center
 from satholder import SatHolder
 from satnode import SatNode
 from vkmgr import VKManager
@@ -23,7 +24,7 @@ def process(cnfname):
     vkm = make_vkm(cnfname)
     satslots = list(range(vkm.nov))
     sh = SatHolder(satslots)
-    SatNode.maxnov = sh.ln
+    Center.maxnov = sh.ln
 
     sn = SatNode(None, sh, vkm)
     while not sn.done:

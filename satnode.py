@@ -7,7 +7,6 @@ from center import Center
 class SatNode:
     # debug = False
     debug = True
-    maxnov = 0
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent
@@ -90,7 +89,7 @@ class SatNode:
                 self.parent.trim_chs(higher_vals_inuse)
 
     def is_top(self):
-        return self.nov == SatNode.maxnov
+        return self.nov == Center.maxnov
 
     def solve(self):
         return Center.sats
@@ -98,7 +97,7 @@ class SatNode:
     def update_cnt(self):
         cnts = {}
         for nov, sn in Center.snodes.items():
-            if nov < SatNode.maxnov:
+            if nov < Center.maxnov:
                 cnt = {v: len(tn.pthmgr.dic.keys())
                        for v, tn in sn.chdic.items()}
                 cnts[nov] = cnt

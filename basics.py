@@ -6,6 +6,13 @@ def verify_sat(vkdic, sat):
     return True
 
 
+def nov_val(msg):  # '12.4' -> 12, 4
+    lst = []
+    for m in msg.split('.'):
+        lst.append(int(m))
+    return lst
+
+
 def get_bit(val, bit):
     return (val >> bit) & 1
 

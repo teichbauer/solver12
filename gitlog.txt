@@ -1,3 +1,10 @@
+2021-05-14->0.205
+- move maxnov from SatNode to Center
+- recoding pathmgr/finalize:
+  -- all vk1: sat just has the opposite value as vk1.dic[bit]
+  -- every path-name (12.4 -> 12, 4) in path will set 3 bit/vals
+  -- all free bits will varry 0/1
+  -- all vk2 : TBD
 2021-05-12->0.204
 - found a bug!
   60.2/vmk has a vk:C0051{8:1, 9:0}. 50.2/hsat:{39"0,20:1,9:0} reduced it

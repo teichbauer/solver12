@@ -1,12 +1,10 @@
 from vk12mgr import VK12Manager
 from node12 import Node12
 from center import Center
+from basics import nov_val, get_bit
 
 
 class PathManager:
-    # sats = []
-    # limit = 10
-    # ------------------
     # debug = False
     debug = True
     ''' -----------------------------------------------------------------------
@@ -57,11 +55,47 @@ class PathManager:
                     else:
                         self.dic[pname] = vkm
 
+    # def finalize(self, vkm, pathname):
+    #     n12 = Node12(self, self.tnode.sh.clone(),
+    #                  self.tnode.hsat, vkm)
+    #     n12.path_name = pathname
+    #     if n12.done:
+    #         n12.collect_sat()
+    #     else:
+    #         n12.spawn()
+
+    def vk2sat(self, vk2, sat, bitSet):
+        pass
+
     def finalize(self, vkm, pathname):
-        n12 = Node12(self, self.tnode.sh.clone(),
-                     self.tnode.hsat, vkm)
-        n12.path_name = pathname
-        if n12.done:
-            n12.collect_sat()
+        bit_set = set(range(Center.maxnov))
+        sat = {}
+        for kn in vkm.kn1s:
+            bit = vkm.vkdic[kn].bits[0]
+            v = vkm.vkdic[kn].dic[bit]
+            sat[bit] = [1, 0][v]
+            if bit in bit_set:
+                bit_set.remove(bit)
+
+        for kn in vkm.kn2s:
+            self.vk2sat(vkm.vkdic[kn], sat, bit_set)
+
+        for name in pathname:
+            nov, val = nov_val(name)
+            bits = Center.snodes[nov]['choice']
+            vals = [get_bit(val, 2), get_bit(val, 1), get_bit(val, 0]
+            for ind, b in enumerate(bits):
+                sat[b]=vals[ind]
+                if b in bit_set:
+                    bit_set.remove(b)
+
+        n=len(bit_set)
+        if n > 0:
+            lst=tuple(bit_set)
+            for v in range(n):
+                ssat=sat.copy()
+                for k in n:
+                    ssat[lst[k]]=get_bit(v, k)
+                Center.sats.append(ssat)
         else:
-            n12.spawn()
+            Center.sats.append(sat)

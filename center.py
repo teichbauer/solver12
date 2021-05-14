@@ -1,4 +1,5 @@
 class Center:
+    maxnov = 0
     sats = []
     limit = 10
 
