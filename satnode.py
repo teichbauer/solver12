@@ -5,8 +5,8 @@ from center import Center
 
 
 class SatNode:
-    # debug = False
-    debug = True
+    debug = False
+    # debug = True
 
     def __init__(self, parent, sh, vkm):
         self.parent = parent

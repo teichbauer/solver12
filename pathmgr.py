@@ -5,8 +5,8 @@ from basics import nov_val, get_bit
 
 
 class PathManager:
-    # debug = False
-    debug = True
+    debug = False
+    # debug = True
     ''' -----------------------------------------------------------------------
        Each tnode has self.pthmgr(instance of PathManager class), with *.dic:
          {<vkey>:<vkmgr>,...}, where <vkey> is concadinated key(hp isnt top):
@@ -82,20 +82,20 @@ class PathManager:
 
         for name in pathname:
             nov, val = nov_val(name)
-            bits = Center.snodes[nov]['choice']
-            vals = [get_bit(val, 2), get_bit(val, 1), get_bit(val, 0]
+            bits = Center.snodes[nov].choice['bits']
+            vals = [get_bit(val, 2), get_bit(val, 1), get_bit(val, 0)]
             for ind, b in enumerate(bits):
-                sat[b]=vals[ind]
+                sat[b] = vals[ind]
                 if b in bit_set:
                     bit_set.remove(b)
 
-        n=len(bit_set)
+        n = len(bit_set)
         if n > 0:
-            lst=tuple(bit_set)
-            for v in range(n):
-                ssat=sat.copy()
-                for k in n:
-                    ssat[lst[k]]=get_bit(v, k)
+            lst = tuple(bit_set)
+            for v in range(2**n):
+                ssat = sat.copy()
+                for ind, k in enumerate(lst):
+                    ssat[k] = get_bit(v, ind)
                 Center.sats.append(ssat)
         else:
             Center.sats.append(sat)
