@@ -28,7 +28,7 @@ def process(cnfname):
 
     sn = SatNode(None, sh, vkm)
     while not sn.done:
-        print(f'spawning at nov = {sn.nov}')
+        # print(f'spawning at nov = {sn.nov}')
         sn = sn.spawn()
     return sn.solve()
 

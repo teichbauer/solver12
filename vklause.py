@@ -7,7 +7,6 @@ class VKlause:
         this vk can be a splited version from a origin vk
         the origin field refs to that (3-bits vk)
         '''
-    # nov not used - remove it?
 
     def __init__(self, kname, dic, nov):
         self.kname = kname    # this vk can be a partial one: len(bits) < 3)
@@ -32,7 +31,7 @@ class VKlause:
             for b in bits2b_dropped:
                 # drop off this bit from dic.
                 dic.pop(b, None)
-        if len(dic):
+        if len(dic) > 0:
             return VKlause(self.kname, dic, self.nov)
         else:
             return None
