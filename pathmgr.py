@@ -1,5 +1,5 @@
 from vk12mgr import VK12Manager
-from node12 import Node12
+from node2 import Node2
 from center import Center
 from basics import nov_val, get_bit
 
@@ -55,8 +55,10 @@ class PathManager:
                     else:
                         self.dic[pname] = vkm
 
-    def vk2sat(self, vk2, sat, bitSet):
-        pass
+    def vk2sat(self, vkm):
+        node = Node2(vkm)
+        sat = node.spawn({})
+        return sat
 
     def finalize(self, vkm, pathname):
         bit_set = set(range(Center.maxnov))
@@ -68,8 +70,13 @@ class PathManager:
             if bit in bit_set:
                 bit_set.remove(bit)
 
-        for kn in vkm.kn2s:
-            self.vk2sat(vkm.vkdic[kn], sat, bit_set)
+        if len(vkm.kn2s) > 0:
+            vkm2 = VK12Manager(Center.maxnov)
+            for kn in vkm.kn2s:
+                vkm2.add_vk2(vkm.vkdic[kn])
+            sat2 = self.vk2sat(vkm2)
+            for b, v in sat2.items():
+                sat[b] = v
 
         for name in pathname:
             nov, val = nov_val(name)

@@ -1,3 +1,6 @@
+2021-05-20->0.208
+- Node2 for processing vks in vkm. Not yet finished.
+- get rid of node12.
 2021-05-19->0.207
 - add_ancvks?
 2021-05-15->0.206

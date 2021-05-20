@@ -31,11 +31,10 @@ class SatNode:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
         Center.snodes[self.nov] = self
-        if self.done:
-            novs = sorted(Center.snodes.keys(), reverse=True)
-            for nov in novs[1:]:
-                Center.snodes[nov].make_paths()
-            cnts = self.update_cnt()
+        self.make_paths()
+        if self.parent:
+            self.parent.chdic = {}
+        # cnts = self.update_cnt()
     # end of def prepare(self):
 
     def spawn(self):

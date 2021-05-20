@@ -65,7 +65,7 @@ class VKManager:
             # print(f'child-{val}')
             tnode = TNode(sub_vk12dic, snode, val)
             if tnode.vkm.valid:
-                Center.repo[tnode.name] = tnode
+                # Center.repo[tnode.name] = tnode
                 chs[val] = tnode
         if len(vk3dic) == 0:
             return None, chs
