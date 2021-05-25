@@ -15,7 +15,7 @@ class VK12Manager:
             self.add_vkdic(vkdic)
 
     def reset(self):
-        self.bdic = {}
+        self.bdic = {}  # dict keyed by bit, value: list of knames
         self.vkdic = {}
         self.kn1s = []
         self.kn2s = []
