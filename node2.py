@@ -22,22 +22,22 @@ class Node2:
             cvs.append(vk.compressed_value())
             return tuple(cvs), None
         sbit = self.bvk_bset.intersection(vk.bits).pop()
-        vk.drop_bit(sbit)
         ind = self.bvk.bits.index(sbit)
         if ind == 0:
             if vk.dic[sbit] == 0:
-                cvs.apend(0)
+                cvs.append(0)
                 cvs.apend(1)
             else:  # vk.dic[sbit] == 1
-                cvs.apend(2)
-                cvs.apend(3)
+                cvs.append(2)
+                cvs.append(3)
         else:
             if vk.dic[sbit] == 0:
-                cvs.apend(0)
-                cvs.apend(2)
+                cvs.append(0)
+                cvs.append(2)
             else:  # vk.dic[sbit] == 1
-                cvs.apend(1)
-                cvs.apend(3)
+                cvs.append(1)
+                cvs.append(3)
+        vk.drop_bit(sbit)
         return tuple(cvs), vk
 
     def reduce(self):

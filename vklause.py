@@ -21,7 +21,7 @@ class VKlause:
         return self.dic[self.bits[0]]
 
     def lbit_value(self):
-        return self.dic[self.bits[-1]
+        return self.dic[self.bits[-1]]
 
     def drop_bit(self, bit):
         if len(self.bits) > 1 and bit in self.bits:
