@@ -17,6 +17,12 @@ class VKlause:
         # void bits of the nov-bits
         self.nob = len(self.bits)             # 1, 2 or 3
 
+    def hbit_value(self):
+        return self.dic[self.bits[0]]
+
+    def lbit_value(self):
+        return self.dic[self.bits[-1]
+
     def drop_bit(self, bit):
         if len(self.bits) > 1 and bit in self.bits:
             self.bits.remove(bit)
