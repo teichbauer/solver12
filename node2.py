@@ -1,10 +1,14 @@
+from os import SEEK_HOLE
 from basics import get_bit
 
 
 class Node2:
-    def __init__(self, vkm, sat=None):
+    def __init__(self, vkm, sh, sat=None):
         self.vkm = vkm
-        if not sat:
+        self.sh = sh
+        if sat:
+            self.sat = sat
+        else:
             self.sat = {}
         self.set_bvk()
         self.reduce()
@@ -14,9 +18,16 @@ class Node2:
         bs.sort()  # highst bit at the end
         tbit = bs[-1]
         self.bvk = self.vkm.vkdic[self.vkm.bdic[tbit][0]]
+        self.vsdic = {
+            0: {self.bvk.bits[0]: 0, self.bvk.bits[1]: 0},
+            1: {self.bvk.bits[0]: 0, self.bvk.bits[1]: 1},
+            2: {self.bvk.bits[0]: 1, self.bvk.bits[1]: 0},
+            3: {self.bvk.bits[0]: 1, self.bvk.bits[1]: 1}
+        }
 
     def cvs_vs(self, vk):
         ' return: 1 or 2 covered-values in [0..3], and vk1(or None) '
+
         cvs = []
         if vk.bits == self.bvk.bits:
             cvs.append(vk.compressed_value())
@@ -48,6 +59,7 @@ class Node2:
         hit_kns = set(bdic[self.bvk.bits[0]]).union(bdic[self.bvk.bits[1]])
         hit_kns.remove(self.bvk.kname)
         self.vkm.remove_vk2(self.bvk.kname)
+        sh = self.sh.reduce(self.bvk.bits)
         kns = self.vkm.kn2s
         tdic = {}
         for kn in kns:
@@ -56,18 +68,10 @@ class Node2:
                 if vk:
                     tdic.setdefault(cvs, []).append(vk)
                 self.vkm.remove_vk2(kn)
-        vsdic = {
-            0: {self.bvk.bits[0]: 0, self.bvk.bits[1]: 0},
-            1: {self.bvk.bits[0]: 0, self.bvk.bits[1]: 1},
-            2: {self.bvk.bits[0]: 1, self.bvk.bits[1]: 0},
-            3: {self.bvk.bits[0]: 1, self.bvk.bits[1]: 1}
-        }
-        for v in vsdic:
+        for v in self.vsdic:
             if v in self.crvs:
                 continue
-            sat = {}
-            for b in (0, 1):
-                sat[self.bvk.bits[b]] = get_bit(v, b)
+            sat = self.vsdic[v]
             for tvs, vks in tdic.items():
                 if v in tvs:
                     for vk1 in vks:

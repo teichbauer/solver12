@@ -56,7 +56,7 @@ class PathManager:
                         self.dic[pname] = vkm
 
     def vk2sat(self, vkm):
-        node = Node2(vkm)
+        node = Node2(vkm, self.tnode.sh)
         sat = node.spawn({})
         return sat
 
