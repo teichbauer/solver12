@@ -11,7 +11,7 @@ class Node2:
         else:
             self.sat = {}
         self.set_bvk()
-        self.reduce()
+        self.chdic = self.reduce()
 
     def set_bvk(self):
         bs = list(self.vkm.bdic.keys())
@@ -26,8 +26,13 @@ class Node2:
         }
 
     def cvs_vs(self, vk):
-        ' return: 1 or 2 covered-values in [0..3], and vk1(or None) '
-
+        ''' on the 2 bits of bvk, vk hit 1 or 2. In case of vk
+            a: hitting 1 bit: 2 values in self.vsdic-keys are returned
+              and a vk1 for the not-hit bit
+            b: hitting 2 bits: return 1 value (in cvs), sitting on these 
+               2 bits, and vk1 == None
+            return: [<cvs], vk1
+            '''
         cvs = []
         if vk.bits == self.bvk.bits:
             cvs.append(vk.compressed_value())
@@ -64,10 +69,13 @@ class Node2:
         tdic = {}
         for kn in kns:
             if kn in hit_kns:
-                cvs, vk = self.cvs_vs(self.vkm.vkdic[kn])
-                if vk:
-                    tdic.setdefault(cvs, []).append(vk)
                 self.vkm.remove_vk2(kn)
+                cvs, vk = self.cvs_vs(self.vkm.vkdic[kn])
+                if vk:  # vk1 exists. cvs has 2 values
+                    tdic.setdefault(cvs, []).append(vk)
+                else:
+                    # kn has the same bits as bvk: 1 value add to crvs
+                    self.crvs.add(cvs[0])
         for v in self.vsdic:
             if v in self.crvs:
                 continue

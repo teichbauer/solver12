@@ -61,7 +61,6 @@ def work(configfilename, verify=True):
 
 
 if __name__ == '__main__':
-    global FINAL
     # configfilename = 'cfg100-450.json'
     # configfilename = 'cfg60-266.json'
     # configfilename = 'cfg60-262.json'
