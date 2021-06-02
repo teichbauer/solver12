@@ -11,12 +11,21 @@ class SatHolder:
 
     def reduce(self, topbits):
         ''' reduce varray to just the given topbits. 
-            return a new satholder with varray containing rest of the bits.
+            return a new satholder with varray containing the bits dropped.
             After this.self.varray has reverse (high>low) bit-order. '''
         varray = [b for b in self.varray if b not in topbits]
         self.varray = list(reversed(topbits[:]))
         self.ln = len(topbits)
         return SatHolder(varray)
+
+    def drop_vars(self, vars):  # drop 1 var or list/set of vars from varray
+        if type(vars) == type(0):
+            if vars in self.varray:
+                self.varray.remove(vars)
+                self.ln -= 1
+        else:  # list or set
+            for v in vars:
+                self.drop_vars(v)
 
     def reduce_vk(self, vk):
         ''' return: vk12, vk3, cvr '''
