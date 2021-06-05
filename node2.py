@@ -1,4 +1,5 @@
-from os import SEEK_HOLE
+from vk12mgr import VK12Manager
+from center import Center
 from basics import get_bit
 
 
@@ -10,8 +11,9 @@ class Node2:
             self.sat = sat
         else:
             self.sat = {}
-        self.set_bvk()
-        self.chdic = self.reduce()
+        self.valid = self.set_bvk()
+        if self.valid:
+            self.chdic = self.reduce()
 
     def set_bvk(self):
         # vkdic has only vk2s in it
@@ -43,24 +45,38 @@ class Node2:
             }
         }
         bdic = self.vkm.bdic
+        # collect vk1s - first round
         touched = set(bdic[self.bvk.bits[0]] + bdic[self.bvk.bits[1]])
-        while len(touched) > 0:
-            tkn = touched.pop(0)
+        vk1m = VK12Manager(Center.maxnov)
+        self.cvs_dic = {}  # {<cv>:[kn1,kn1,..], ...}
+        for tkn in touched:
             vk = self.vkm.remove_vk2(tkn)
             cvs, vk1 = self.cvs_vs(vk)
             if vk1:
-                new_vk1 = self.trim_vk1(cvs, vk1)
-                if new_vk1:
-                    touched.append(new_vk1)
+                vk1m.add_vk1(vk1)  # cvs has 2 values
+                for v in cvs:
+                    self.cvs_dic.setdefault(v, []).append(vk1)
             else:
-                self.crvs.add(cvs[0])
+                self.crvs.add(cvs[0])  # cvs has only 1 value
+        if not vk1m.valid:
+            return False
 
-    def trim_vk1(self, cvs, vk1):
-        for v in cvs:
-            bit = vk1.bits[0]
-            self.vsdic[v]['sat'][bit] = int(not vk1.dic[bit])
-            self.vsdic[v]['sh'].drop_vars(bit)
-        kn2s = self.vkm.bdic[bit]
+        # see if any left-over vk2 touched by any vk1 and becomes vk1
+        bs = list(vk1m.bdic.keys())
+        for b in bs:
+            if b in self.vkm.bdic and len(self.vkm.bdic[b]) > 0:
+                for kn in self.vkm.bdic[b]:
+                    vk2 = self.vkm.remove_vk2(kn)
+                    self.sh.drop_vars(vk2.bits)
+                    added = vk1m.add_vk2(vk2)
+                    if not vk1m.valid:
+                        break
+                    if added:
+                        for v in (0, 1, 2, 3):
+                            self.cvs_dic[v] = vk1m.vkdic[kn]
+                if not vk1m.valid:
+                    return False
+        return True
 
     def cvs_vs(self, vk):
         ''' on the 2 bits of bvk, vk hit 1 or 2. In case of vk
@@ -96,37 +112,20 @@ class Node2:
 
     def reduce(self):
         ' break off topbit '
-        bdic = self.vkm.bdic
-        hit_kns = set(bdic[self.bvk.bits[0]]).union(bdic[self.bvk.bits[1]])
-        hit_kns.remove(self.bvk.kname)
-        self.vkm.remove_vk2(self.bvk.kname)
-        kns = self.vkm.kn2s
-        tdic = {}
-        for kn in kns:
-            if kn in hit_kns:
-                knvk = self.vkm.vkdic.pop(kn)
-                cvs, vk = self.cvs_vs(knvk)
-                if vk:  # vk1 exists. cvs has 2 values
-                    for v in cvs:
-                        bt = vk.bits[0]
-                        bv = vk.hbit_value()
-                        self.vsdic[v]['sat'][bt] = int(not bv)
-                        self.vsdic[v]['sh'].drop_vars(bt)
-                    # tdic.setdefault(cvs, []).append(vk)
-                else:
-                    # kn has the same bits as bvk: 1 value add to crvs
-                    self.crvs.add(cvs[0])
-            else:
-                pass
-        for v in self.vsdic:
-            if v in self.crvs:
-                continue
-            sat = self.vsdic[v]
-            for tvs, vks in tdic.items():
-                if v in tvs:
-                    for vk1 in vks:
-                        b = vk1.bits[0]
-                        sat[b] = [1, 0][vk1.dic[b]]
-
-        for kn in kns:
+        # vk1m has only vk1s in ti
+        if len(self.vkm.kn2s) > 0:
             pass
+        else:
+            for v in (0, 1, 2, 3):
+                if v in self.crvs:
+                    del self.vsdic[v]
+                    continue
+                if v in self.cvs_dic:
+                    for vk1 in self.cvs_dic[v]:
+                        bit = vk1.bits[0]
+                        self.vsdic[v]['sat'][bit] = int(not vk1.dic[bit])
+                        self.vsdic[v]['sh'].drop_vars(bit)
+                else:
+                    for var in self.vsdic[v]['sh'].varray:
+                        self.vsdic[v]['sat'][var] = 2
+                    self.vsdic[v]['sh'] = None
