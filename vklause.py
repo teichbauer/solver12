@@ -23,8 +23,12 @@ class VKlause:
     def lbit_value(self):
         return self.dic[self.bits[-1]]
 
+    def drop_bits(self, bits):
+        for bit in bits:
+            self.drop_bit(bit)
+
     def drop_bit(self, bit):
-        if len(self.bits) > 1 and bit in self.bits:
+        if bit in self.bits and len(self.bits) > 1:
             self.bits.remove(bit)
             self.nob -= 1
             self.dic.pop(bit)

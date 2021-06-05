@@ -14,10 +14,11 @@ class Node2:
         self.chdic = self.reduce()
 
     def set_bvk(self):
-        bs = list(self.vkm.bdic.keys())
-        bs.sort()  # highst bit at the end
-        tbit = bs[-1]
-        self.bvk = self.vkm.vkdic[self.vkm.bdic[tbit][0]]
+        # vkdic has only vk2s in it
+        tbit = sorted(self.vkm.bdic.keys())[-1]  # take highst bit at the end
+        # take a vk2 with top bit
+        self.bvk = self.vkm.remove_vk2(self.vkm.bdic[tbit][0])
+        self.crvs = set([self.bvk.compressed_value()])
         self.sh.drop_vars(self.bvk.bits)
         self.vsdic = {
             0: {
@@ -41,6 +42,25 @@ class Node2:
                 'child': None
             }
         }
+        bdic = self.vkm.bdic
+        touched = set(bdic[self.bvk.bits[0]] + bdic[self.bvk.bits[1]])
+        while len(touched) > 0:
+            tkn = touched.pop(0)
+            vk = self.vkm.remove_vk2(tkn)
+            cvs, vk1 = self.cvs_vs(vk)
+            if vk1:
+                new_vk1 = self.trim_vk1(cvs, vk1)
+                if new_vk1:
+                    touched.append(new_vk1)
+            else:
+                self.crvs.add(cvs[0])
+
+    def trim_vk1(self, cvs, vk1):
+        for v in cvs:
+            bit = vk1.bits[0]
+            self.vsdic[v]['sat'][bit] = int(not vk1.dic[bit])
+            self.vsdic[v]['sh'].drop_vars(bit)
+        kn2s = self.vkm.bdic[bit]
 
     def cvs_vs(self, vk):
         ''' on the 2 bits of bvk, vk hit 1 or 2. In case of vk
@@ -77,7 +97,6 @@ class Node2:
     def reduce(self):
         ' break off topbit '
         bdic = self.vkm.bdic
-        self.crvs = set([self.bvk.compressed_value()])
         hit_kns = set(bdic[self.bvk.bits[0]]).union(bdic[self.bvk.bits[1]])
         hit_kns.remove(self.bvk.kname)
         self.vkm.remove_vk2(self.bvk.kname)
@@ -97,6 +116,8 @@ class Node2:
                 else:
                     # kn has the same bits as bvk: 1 value add to crvs
                     self.crvs.add(cvs[0])
+            else:
+                pass
         for v in self.vsdic:
             if v in self.crvs:
                 continue
