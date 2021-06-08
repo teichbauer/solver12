@@ -57,26 +57,13 @@ class PathManager:
 
     def vk2sat(self, vkm):
         node = Node2(vkm, self.tnode.sh)
-        sat = node.spawn({})
-        return sat
+        if node.valid:
+            return node.reduce()
+        return []
 
     def finalize(self, vkm, pathname):
-        bit_set = set(range(Center.maxnov))
+        bit_set = set(range(Center.maxnov))  # set of all bits (var-names)
         sat = {}
-        for kn in vkm.kn1s:
-            bit = vkm.vkdic[kn].bits[0]
-            v = vkm.vkdic[kn].dic[bit]
-            sat[bit] = [1, 0][v]
-            if bit in bit_set:
-                bit_set.remove(bit)
-
-        if len(vkm.kn2s) > 0:
-            vkm2 = VK12Manager(Center.maxnov)
-            for kn in vkm.kn2s:
-                vkm2.add_vk2(vkm.vkdic[kn])
-            sat2 = self.vk2sat(vkm2)
-            for b, v in sat2.items():
-                sat[b] = v
 
         for name in pathname:
             nov, val = nov_val(name)
@@ -87,13 +74,33 @@ class PathManager:
                 if b in bit_set:
                     bit_set.remove(b)
 
-        n = len(bit_set)
-        if n > 0:
+        for kn in vkm.kn1s:
+            bit = vkm.vkdic[kn].bits[0]
+            v = vkm.vkdic[kn].dic[bit]
+            sat[bit] = [1, 0][v]
+            if bit in bit_set:
+                bit_set.remove(bit)
+        if len(bit_set) == 0:
+            Center.sats.append(sat)
+            return
+
+        if len(vkm.kn2s) > 0:
+            vkm2 = VK12Manager(Center.maxnov)
+            for kn in vkm.kn2s:
+                vkm2.add_vk2(vkm.vkdic[kn])
+            sat2s = self.vk2sat(vkm2)
+            for s2 in sat2s:
+                for b in s2:
+                    if b in bit_set:
+                        bit_set.remove(b)
+                Center.sats.append({**s2, **sat})
+
+        if len(bit_set) > 0:
             lst = tuple(bit_set)
             for v in range(2**n):
                 ssat = sat.copy()
                 for ind, k in enumerate(lst):
                     ssat[k] = get_bit(v, ind)
                 Center.sats.append(ssat)
-        else:
-            Center.sats.append(sat)
+        # else:
+        #     Center.sats.append(sat)

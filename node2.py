@@ -5,6 +5,7 @@ from basics import get_bit
 
 class Node2:
     def __init__(self, vkm, sh, sat=None):
+
         self.vkm = vkm
         self.sh = sh
         if sat:
@@ -12,8 +13,8 @@ class Node2:
         else:
             self.sat = {}
         self.valid = self.set_bvk()
-        if self.valid:
-            self.chdic = self.reduce()
+        # if self.valid:
+        #     self.chdic = self.reduce()
 
     def set_bvk(self):
         # vkdic has only vk2s in it
@@ -115,7 +116,9 @@ class Node2:
         # vk1m has only vk1s in ti
         if len(self.vkm.kn2s) > 0:
             pass
+            return []
         else:
+            sats = []
             for v in (0, 1, 2, 3):
                 if v in self.crvs:
                     del self.vsdic[v]
@@ -125,7 +128,11 @@ class Node2:
                         bit = vk1.bits[0]
                         self.vsdic[v]['sat'][bit] = int(not vk1.dic[bit])
                         self.vsdic[v]['sh'].drop_vars(bit)
+
                 else:
                     for var in self.vsdic[v]['sh'].varray:
                         self.vsdic[v]['sat'][var] = 2
                     self.vsdic[v]['sh'] = None
+                sats.append(self.vsdic[v]['sat'])
+            return sats
+        x = 1
