@@ -66,7 +66,8 @@ class Node2:
         bs = list(vk1m.bdic.keys())
         for b in bs:
             if b in self.vkm.bdic and len(self.vkm.bdic[b]) > 0:
-                for kn in self.vkm.bdic[b]:
+                kn2s = self.vkm.bdic[b][:]
+                for kn in kn2s:
                     vk2 = self.vkm.remove_vk2(kn)
                     self.sh.drop_vars(vk2.bits)
                     added = vk1m.add_vk2(vk2)
@@ -115,7 +116,7 @@ class Node2:
         ' break off topbit '
         # vk1m has only vk1s in ti
         if len(self.vkm.kn2s) > 0:
-            pass
+            pass  # TBD
             return []
         else:
             sats = []

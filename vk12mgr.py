@@ -178,9 +178,15 @@ class VK12Manager:
         self.vkdic[vk.kname] = vk
         return True
 
+    def remove_vk1(self, kname=None):
+        if len(self.kn1s) == 0:
+            return None
+        kn = self.kn1s.pop(0)
+        vk = self.vkdic.pop(kn)
+        self.bdic[vk.bits[0]].remove(kn)
+        return vk
+
     def remove_vk2(self, kname):
-        if kname not in self.kn2s or kname not in self.vkdic:
-            raise Exception(f'{kname} not in for removal')
         self.kn2s.remove(kname)
         vk = self.vkdic.pop(kname)
         for b in vk.bits:

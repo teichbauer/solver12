@@ -63,25 +63,26 @@ class PathManager:
 
     def finalize(self, vkm, pathname):
         bit_set = set(range(Center.maxnov))  # set of all bits (var-names)
-        sat = {}
+        rsat = {}
 
         for name in pathname:
             nov, val = nov_val(name)
             bits = Center.snodes[nov].choice['bits']
             vals = [get_bit(val, 2), get_bit(val, 1), get_bit(val, 0)]
             for ind, b in enumerate(bits):
-                sat[b] = vals[ind]
+                rsat[b] = vals[ind]
                 if b in bit_set:
                     bit_set.remove(b)
 
-        for kn in vkm.kn1s:
-            bit = vkm.vkdic[kn].bits[0]
-            v = vkm.vkdic[kn].dic[bit]
-            sat[bit] = [1, 0][v]
+        while len(vkm.kn1s) > 0:
+            vk1 = vkm.remove_vk1()
+            bit = vk1.bits[0]
+            rsat[bit] = int(not vk1.dic[bit])
             if bit in bit_set:
                 bit_set.remove(bit)
+
         if len(bit_set) == 0:
-            Center.sats.append(sat)
+            Center.sats.append(rsat)
             return
 
         if len(vkm.kn2s) > 0:
@@ -89,18 +90,18 @@ class PathManager:
             for kn in vkm.kn2s:
                 vkm2.add_vk2(vkm.vkdic[kn])
             sat2s = self.vk2sat(vkm2)
+
             for s2 in sat2s:
                 for b in s2:
                     if b in bit_set:
                         bit_set.remove(b)
-                Center.sats.append({**s2, **sat})
+                Center.sats.append({**s2, **rsat})
 
-        if len(bit_set) > 0:
-            lst = tuple(bit_set)
-            for v in range(2**n):
-                ssat = sat.copy()
-                for ind, k in enumerate(lst):
-                    ssat[k] = get_bit(v, ind)
-                Center.sats.append(ssat)
+        lst = tuple(bit_set)
+        for v in range(2**len(lst)):
+            ssat = sat.copy()
+            for ind, k in enumerate(lst):
+                ssat[k] = get_bit(v, ind)
+            Center.sats.append(ssat)
         # else:
         #     Center.sats.append(sat)
