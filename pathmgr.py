@@ -61,47 +61,40 @@ class PathManager:
             return node.reduce()
         return []
 
-    def finalize(self, vkm, pathname):
-        bit_set = set(range(Center.maxnov))  # set of all bits (var-names)
-        rsat = {}
-
+    def path_sat(self, pathname):
+        sat = {}
         for name in pathname:
             nov, val = nov_val(name)
             bits = Center.snodes[nov].choice['bits']
             vals = [get_bit(val, 2), get_bit(val, 1), get_bit(val, 0)]
             for ind, b in enumerate(bits):
-                rsat[b] = vals[ind]
-                if b in bit_set:
-                    bit_set.remove(b)
+                sat[b] = vals[ind]
+        return sat
 
-        while len(vkm.kn1s) > 0:
-            vk1 = vkm.remove_vk1()
-            bit = vk1.bits[0]
-            rsat[bit] = int(not vk1.dic[bit])
-            if bit in bit_set:
-                bit_set.remove(bit)
+    def fill_rest(self, sat):
+        s = set(range(Center.maxnov)) - set(sat.keys())
+        if len(s) > 0:
+            lst = tuple(s)
+            for v in range(2**len(lst)):
+                ssat = sat.copy()
+                for ind, k in enumerate(lst):
+                    ssat[k] = get_bit(v, ind)
+                Center.sats.append(ssat)
+        else:
+            Center.sats.append(sat)
 
-        if len(bit_set) == 0:
-            Center.sats.append(rsat)
-            return
+    def finalize(self, vkm, pathname):
+        rsat = self.path_sat(pathname)
 
-        if len(vkm.kn2s) > 0:
-            vkm2 = VK12Manager(Center.maxnov)
-            for kn in vkm.kn2s:
-                vkm2.add_vk2(vkm.vkdic[kn])
-            sat2s = self.vk2sat(vkm2)
+        # while len(vkm.kn1s) > 0:
+        #     vk1 = vkm.remove_vk1()
+        #     bit = vk1.bits[0]
+        #     rsat[bit] = int(not vk1.dic[bit])
 
-            for s2 in sat2s:
-                for b in s2:
-                    if b in bit_set:
-                        bit_set.remove(b)
-                Center.sats.append({**s2, **rsat})
+        node2 = Node2(vkm, self.tnode.sh)
+        ssats = node2.spawn()
+        # ssats = node2.reduce()
 
-        lst = tuple(bit_set)
-        for v in range(2**len(lst)):
-            ssat = sat.copy()
-            for ind, k in enumerate(lst):
-                ssat[k] = get_bit(v, ind)
-            Center.sats.append(ssat)
-        # else:
-        #     Center.sats.append(sat)
+        while len(ssats) > 0:
+            sat = ssats.pop(0)
+            self.fill_rest({**rsat, **sat})

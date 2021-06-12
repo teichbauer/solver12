@@ -5,16 +5,23 @@ from basics import get_bit
 
 class Node2:
     def __init__(self, vkm, sh, sat=None):
-
         self.vkm = vkm
         self.sh = sh
         if sat:
             self.sat = sat
         else:
             self.sat = {}
+        self.clean_vk1s(vkm, self.sat)
         self.valid = self.set_bvk()
-        # if self.valid:
-        #     self.chdic = self.reduce()
+
+    def clean_vk1s(self, vkm, sat={}):
+        bits = []
+        while len(vkm.kn1s) > 0:
+            vk1 = vkm.remove_vk1()
+            bit = vk1.bits[0]
+            sat[bit] = int(not vk1.dic[bit])
+            bits.append(bit)
+        return bits
 
     def set_bvk(self):
         # vkdic has only vk2s in it
@@ -22,63 +29,47 @@ class Node2:
         # take a vk2 with top bit
         self.bvk = self.vkm.remove_vk2(self.vkm.bdic[tbit][0])
         self.crvs = set([self.bvk.compressed_value()])
-        self.sh.drop_vars(self.bvk.bits)
+        sh = self.sh.clone().drop_vars(self.bvk.bits)
+        ssat = {**self.sat, **{self.bvk.bits[0]: 0, self.bvk.bits[1]: 0}}
         self.vsdic = {
             0: {
-                'sat': {self.bvk.bits[0]: 0, self.bvk.bits[1]: 0},
-                'sh': self.sh.clone(),
-                'child': None
+                'sat': ssat,
+                'sh': sh.clone(),
+                'vkm': VK12Manager(Center.maxnov)
             },
             1: {
-                'sat': {self.bvk.bits[0]: 0, self.bvk.bits[1]: 1},
-                'sh': self.sh.clone(),
-                'child': None
+                'sat': {**ssat, **{self.bvk.bits[1]: 1}},
+                'sh': sh.clone(),
+                'vkm': VK12Manager(Center.maxnov)
             },
             2: {
-                'sat': {self.bvk.bits[0]: 1, self.bvk.bits[1]: 0},
-                'sh': self.sh.clone(),
-                'child': None
+                'sat': {**ssat, **{self.bvk.bits[0]: 1}},
+                'sh': sh.clone(),
+                'vkm': VK12Manager(Center.maxnov)
             },
             3: {
-                'sat': {self.bvk.bits[0]: 1, self.bvk.bits[1]: 1},
-                'sh': self.sh.clone(),
-                'child': None
+                'sat': {**ssat, **{self.bvk.bits[0]: 1, self.bvk.bits[1]: 1}},
+                'sh': sh.clone(),
+                'vkm': VK12Manager(Center.maxnov)
             }
         }
         bdic = self.vkm.bdic
         # collect vk1s - first round
         touched = set(bdic[self.bvk.bits[0]] + bdic[self.bvk.bits[1]])
-        vk1m = VK12Manager(Center.maxnov)
-        self.cvs_dic = {}  # {<cv>:[kn1,kn1,..], ...}
         for tkn in touched:
             vk = self.vkm.remove_vk2(tkn)
             cvs, vk1 = self.cvs_vs(vk)
             if vk1:
-                vk1m.add_vk1(vk1)  # cvs has 2 values
                 for v in cvs:
-                    self.cvs_dic.setdefault(v, []).append(vk1)
+                    self.vsdic[v]['vkm'].add_vk1(vk1)
             else:
                 self.crvs.add(cvs[0])  # cvs has only 1 value
-        if not vk1m.valid:
-            return False
 
-        # see if any left-over vk2 touched by any vk1 and becomes vk1
-        bs = list(vk1m.bdic.keys())
-        for b in bs:
-            if b in self.vkm.bdic and len(self.vkm.bdic[b]) > 0:
-                kn2s = self.vkm.bdic[b][:]
-                for kn in kn2s:
-                    vk2 = self.vkm.remove_vk2(kn)
-                    self.sh.drop_vars(vk2.bits)
-                    added = vk1m.add_vk2(vk2)
-                    if not vk1m.valid:
-                        break
-                    if added:
-                        for v in (0, 1, 2, 3):
-                            self.cvs_dic[v] = vk1m.vkdic[kn]
-                if not vk1m.valid:
-                    return False
-        return True
+        if len(self.vkm.vkdic) > 0:
+            for v in self.vsdic:
+                self.vsdic[v]['vkm'].add_vkdic(self.vkm.vkdic)
+
+        x = 1
 
     def cvs_vs(self, vk):
         ''' on the 2 bits of bvk, vk hit 1 or 2. In case of vk
@@ -111,6 +102,31 @@ class Node2:
                 cvs.append(3)
         vk.drop_bit(sbit)
         return tuple(cvs), vk
+
+    def spawn(self):
+        ssats = []
+        for v in (0, 1, 2, 3):
+            if v in self.crvs:
+                del self.vsdic[v]
+                continue
+            dic = self.vsdic[v]
+            if dic['vkm'].valid and dic['sh'].ln > 0:
+                if len(dic['vkm'].kn1s) > 0:
+                    bits = self.clean_vk1s(dic['vkm'], dic['sat'])
+                    dic['sh'].drop_vars(bits)
+                    if dic['sh'].ln == 0:
+                        ssats.append(dic['sat'])
+                        continue
+                if len(dic['vkm'].kn2s) == 0:
+                    while dic['sh'].ln > 0:
+                        b = dic['sh'].pop()
+                        dic['sat'][b] = 2
+                else:
+                    node2 = Node2(dic['vkm'], dic['sh'], dic['sat'])
+                    ssats2 = node2.spawn()
+                    pass
+            ssats.append(dic['sat'])
+        return ssats
 
     def reduce(self):
         ' break off topbit '

@@ -9,6 +9,21 @@ class SatHolder:
         self.varray = varray
         self.ln = len(varray)
 
+    def pop(self, v=None):
+        if v == None:
+            if self.ln > 0:
+                self.ln -= 1
+                return self.varray.pop(0)
+            else:
+                return None
+        else:
+            if v in self.varray:
+                self.ln -= 1
+                self.varray.remove(v)
+                return v
+            else:
+                return None
+
     def reduce(self, topbits):
         ''' reduce varray to just the given topbits. 
             return a new satholder with varray containing the bits dropped.
@@ -26,6 +41,7 @@ class SatHolder:
         else:  # list or set
             for v in vars:
                 self.drop_vars(v)
+        return self
 
     def reduce_vk(self, vk):
         ''' return: vk12, vk3, cvr '''
