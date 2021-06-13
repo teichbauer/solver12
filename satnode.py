@@ -34,7 +34,6 @@ class SatNode:
         self.make_paths()
         if self.parent:
             self.parent.chdic = {}
-        # cnts = self.update_cnt()
     # end of def prepare(self):
 
     def spawn(self):
@@ -66,8 +65,6 @@ class SatNode:
             Center.repo.pop(tnode.name, None)
         # clean-up higher-chs not being used by any tnode
         self.parent.trim_chs(higher_vals_inuse)
-        # cnts = self.update_cnt()
-        x = 1
 
     def trim_chs(self, used_vals):
         ''' the chdic keys not in used_vals(a set), will be deleted. if this

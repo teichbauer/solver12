@@ -55,12 +55,6 @@ class PathManager:
                     else:
                         self.dic[pname] = vkm
 
-    def vk2sat(self, vkm):
-        node = Node2(vkm, self.tnode.sh)
-        if node.valid:
-            return node.reduce()
-        return []
-
     def path_sat(self, pathname):
         sat = {}
         for name in pathname:
@@ -86,14 +80,8 @@ class PathManager:
     def finalize(self, vkm, pathname):
         rsat = self.path_sat(pathname)
 
-        # while len(vkm.kn1s) > 0:
-        #     vk1 = vkm.remove_vk1()
-        #     bit = vk1.bits[0]
-        #     rsat[bit] = int(not vk1.dic[bit])
-
-        node2 = Node2(vkm, self.tnode.sh)
+        node2 = Node2(vkm, self.tnode.sh.clone())
         ssats = node2.spawn()
-        # ssats = node2.reduce()
 
         while len(ssats) > 0:
             sat = ssats.pop(0)

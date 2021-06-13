@@ -11,8 +11,9 @@ class Node2:
             self.sat = sat
         else:
             self.sat = {}
-        self.clean_vk1s(vkm, self.sat)
-        self.valid = self.set_bvk()
+        bits = self.clean_vk1s(vkm, self.sat)
+        self.sh.drop_vars(bits)
+        self.set_bvk()
 
     def clean_vk1s(self, vkm, sat={}):
         bits = []
@@ -24,6 +25,9 @@ class Node2:
         return bits
 
     def set_bvk(self):
+        if self.sh.ln == 0 or len(self.vkm.kn2s) == 0:
+            self.vsdic = None
+            return
         # vkdic has only vk2s in it
         tbit = sorted(self.vkm.bdic.keys())[-1]  # take highst bit at the end
         # take a vk2 with top bit
@@ -69,8 +73,6 @@ class Node2:
             for v in self.vsdic:
                 self.vsdic[v]['vkm'].add_vkdic(self.vkm.vkdic)
 
-        x = 1
-
     def cvs_vs(self, vk):
         ''' on the 2 bits of bvk, vk hit 1 or 2. In case of vk
             a: hitting 1 bit: 2 values in self.vsdic-keys are returned
@@ -104,52 +106,34 @@ class Node2:
         return tuple(cvs), vk
 
     def spawn(self):
-        ssats = []
-        for v in (0, 1, 2, 3):
-            if v in self.crvs:
-                del self.vsdic[v]
-                continue
-            dic = self.vsdic[v]
-            if dic['vkm'].valid and dic['sh'].ln > 0:
-                if len(dic['vkm'].kn1s) > 0:
-                    bits = self.clean_vk1s(dic['vkm'], dic['sat'])
-                    dic['sh'].drop_vars(bits)
-                    if dic['sh'].ln == 0:
-                        ssats.append(dic['sat'])
-                        continue
-                if len(dic['vkm'].kn2s) == 0:
-                    while dic['sh'].ln > 0:
-                        b = dic['sh'].pop()
-                        dic['sat'][b] = 2
-                else:
-                    node2 = Node2(dic['vkm'], dic['sh'], dic['sat'])
-                    ssats2 = node2.spawn()
-                    pass
-            ssats.append(dic['sat'])
-        return ssats
-
-    def reduce(self):
-        ' break off topbit '
-        # vk1m has only vk1s in ti
-        if len(self.vkm.kn2s) > 0:
-            pass  # TBD
-            return []
+        if self.sh.ln == 0:
+            ssats = [self.sat]
+        elif self.vsdic == None:
+            while self.sh.ln > 0:
+                b = self.sh.pop()
+                self.sat[b] = 2
+            ssats = [self.sat]
         else:
-            sats = []
+            ssats = []
             for v in (0, 1, 2, 3):
                 if v in self.crvs:
                     del self.vsdic[v]
                     continue
-                if v in self.cvs_dic:
-                    for vk1 in self.cvs_dic[v]:
-                        bit = vk1.bits[0]
-                        self.vsdic[v]['sat'][bit] = int(not vk1.dic[bit])
-                        self.vsdic[v]['sh'].drop_vars(bit)
-
-                else:
-                    for var in self.vsdic[v]['sh'].varray:
-                        self.vsdic[v]['sat'][var] = 2
-                    self.vsdic[v]['sh'] = None
-                sats.append(self.vsdic[v]['sat'])
-            return sats
-        x = 1
+                dic = self.vsdic[v]
+                if dic['vkm'].valid and dic['sh'].ln > 0:
+                    if len(dic['vkm'].kn1s) > 0:
+                        bits = self.clean_vk1s(dic['vkm'], dic['sat'])
+                        dic['sh'].drop_vars(bits)
+                        if dic['sh'].ln == 0:
+                            ssats.append(dic['sat'])
+                            continue
+                    if len(dic['vkm'].kn2s) == 0:
+                        while dic['sh'].ln > 0:
+                            b = dic['sh'].pop()
+                            dic['sat'][b] = 2
+                    else:
+                        node2 = Node2(dic['vkm'], dic['sh'], dic['sat'])
+                        ssats2 = node2.spawn()
+                        pass
+                ssats.append(dic['sat'])
+        return ssats
