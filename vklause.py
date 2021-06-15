@@ -109,7 +109,7 @@ class VKlause:
         elif type(v) == type({}):
             hit_cnt = 0
             for bit, value in self.dic.items():
-                if bit in v and v[bit] == value:
+                if bit in v and (v[bit] == value or v[bit] == 2):
                     hit_cnt += 1
             return hit_cnt == self.nob
 

@@ -1,3 +1,7 @@
+2021-06-15->0.218
+- when a sat has value 2(allowing both 0 and 1): 
+  1. vklause.hit covers that; 2. showing 2**(cnt) as sat count.
+  this way, cfg60-266.json has 4x 2 -> 8 sats
 2021-06-14->0.217
 - cfg60-266.json now finds only 4 sats? new bug(s) introduced?
   no. inthese 4 sats, 26:2 is a double. So I did get all 8 sats.
