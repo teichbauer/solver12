@@ -66,7 +66,8 @@ def work(configfilename, verify=True):
 
 if __name__ == '__main__':
     # configfilename = 'cfg100-450.json'
-    configfilename = 'cfg60-266.json'
+    # configfilename = 'cfg60-266.json'
+    configfilename = 'cfg60-280.json'
     # configfilename = 'cfg60-262.json'
     # configfilename = 'config1.json'
     # configfilename = 'cfg12-45.json'

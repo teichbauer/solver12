@@ -63,6 +63,7 @@ class SatNode:
         for tnode in dels:
             self.chdic.pop(tnode.val)
             Center.repo.pop(tnode.name, None)
+        self.done = len(self.chdic) == 0
         # clean-up higher-chs not being used by any tnode
         self.parent.trim_chs(higher_vals_inuse)
 
