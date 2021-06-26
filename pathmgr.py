@@ -37,8 +37,6 @@ class PathManager:
                         else:
                             names.insert(0, tnode.name)
                             self.dic[tuple(names)] = vk12m
-                # else:   # tn_vk12_residue_vkdic == None
-                #   pass  # dump it
         else:
             # holder.parent is not top-level snode, its tnodes has pthmgr
             for va, tn in hp_chdic.items():

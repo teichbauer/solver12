@@ -1,4 +1,6 @@
-from basics import print_json, display_vkdic
+# from typing_extensions import ParamSpecKwargs
+from vk12mgr import VK12Manager
+from basics import print_json, display_vkdic, get_bit
 from satholder import SatHolder
 from pathmgr import PathManager
 from center import Center
@@ -19,22 +21,64 @@ class SatNode:
 
     def prepare(self):
         self.choice = self.vkm.choose_anchor()
-        for bvkn in self.choice['ancs']:
-            bvk = self.vkm.vkdic[bvkn]
-            Center.anchor_vks.setdefault(self.nov, []).append(bvk)
+        self.make_skeleton()
+        # for bvkn in self.choice['ancs']:
+        #     bvk = self.vkm.vkdic[bvkn]
+        #     Center.anchor_vks.setdefault(self.nov, []).append(bvk)
         self.next_sh = self.sh.reduce(self.choice['bits'])
 
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         self.tx_vkm, self.chdic = self.vkm.morph(self)  # tx_vkm: all vk3s
+
         self.done = (self.tx_vkm == None) or len(self.tx_vkm.vkdic) == 0
         if self.debug:
             ks = [f'{self.nov}.{k}' for k in self.chdic.keys()]
             print(f'keys: {ks}')
         Center.snodes[self.nov] = self
-        self.make_paths()
-        if self.parent:
-            self.parent.chdic = {}
+        if self.done:
+            for nov, sn in Center.snodes.items():
+                for cv, ctn in sn.chdic.items():
+                    sn.set_topdowns(ctn)
+            x = 1
+            # self.make_paths()
+        # if self.parent:
+        #     self.parent.chdic = {}
     # end of def prepare(self):
+
+    def make_skeleton(self):
+        thsats = Center.skeleton.setdefault(self.nov, {})
+        cvrs = []
+        for bvkn in self.choice['ancs']:
+            cvrs.append(self.vkm.vkdic[bvkn].compressed_value())
+        for v in range(8):
+            if v not in cvrs:
+                hsat = thsats.setdefault(v, {})
+                for indx, b in enumerate(self.choice['bits']):
+                    hsat[b] = get_bit(v, 2 - indx)
+
+    def set_topdowns(self, tnode):
+        td_dic = Center.topdowns.setdefault(self.nov, {})
+        novs = sorted(Center.skeleton.keys(), reverse=True)
+        ind = novs.index(self.nov)
+        for nov in novs[ind + 1:]:
+            tname = f'{nov}.'
+            sdic = Center.skeleton[nov]
+            for k, v in sdic.items():
+                tname += f'{v}'
+                add_it = True
+                td_vkm = VK12Manager(Center.maxnov)
+                for kn, vk in tnode.vkm.vkdic.items():
+                    ttl_hit, v12 = vk.partial_hit_residue(sdic[k])
+                    if ttl_hit:
+                        add_it = False
+                        break
+                    elif v12:
+                        td_vkm.add_vk(v12)
+                        if not td_vkm.valid:
+                            add_it = False
+                            break
+                if add_it:
+                    td_dic[v] = td_vkm
 
     def spawn(self):
         # print(f'snode-nov{self.nov}')

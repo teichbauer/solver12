@@ -59,13 +59,13 @@ class VKManager:
             sub_vk12dic = {}
             for cvr in tdic:
                 if val in cvr:  # touched kn/kv does have outside bit
-                    vks = tdic[cvr]
-                    for vk in vks:
-                        sub_vk12dic[vk.kname] = vk.clone()
+                    vk2s = tdic[cvr]
+                    for vk2 in vk2s:
+                        sub_vk12dic[vk2.kname] = vk2.clone()
             # print(f'child-{val}')
             tnode = TNode(sub_vk12dic, snode, val)
             if tnode.vkm.valid:
-                # Center.repo[tnode.name] = tnode
+                Center.repo[tnode.name] = tnode
                 chs[val] = tnode
         if len(vk3dic) == 0:
             return None, chs

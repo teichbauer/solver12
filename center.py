@@ -5,4 +5,5 @@ class Center:
 
     repo = {}
     snodes = {}
-    anchor_vks = {}
+    skeleton = {}
+    topdowns = {}
